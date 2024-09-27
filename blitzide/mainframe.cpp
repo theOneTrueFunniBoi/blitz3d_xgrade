@@ -688,7 +688,7 @@ void MainFrame::build( bool exec,bool publish ){
 			exe="untitled";
 		}
 
-		static char *exeFilter="Executable files (*.exe)|*.exe||";
+		static char *exeFilter="Windows Executable files (*.exe)|*.exe||";
 		int t=OFN_NOCHANGEDIR|OFN_PATHMUSTEXIST|OFN_OVERWRITEPROMPT;
 		CFileDialog fd( false,"exe",exe.c_str(),t,exeFilter );
 		fd.m_ofn.lpstrTitle="Select executable filename";
@@ -779,12 +779,12 @@ void MainFrame::helpHome(){
 	HtmlHelp *h=findHelp();
 	string t;
 	t="index.html";
-	h->Navigate( (prefs.homeDir+"/help/"+t).c_str() );
+	h->Navigate( (prefs.homeDir+"/../help/"+t).c_str() );
 }
 
 void MainFrame::helpAutodoc(){
 	HtmlHelp *h=findHelp();
-	h->Navigate( (prefs.homeDir+"/help/autodoc.html").c_str() );
+	h->Navigate( (prefs.homeDir+"/../help/autodoc.html").c_str() );
 }
 
 void MainFrame::helpBack(){
