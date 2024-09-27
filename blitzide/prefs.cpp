@@ -20,7 +20,7 @@ void Prefs::open(){
 
 	homeDir=p;
 
-    AddFontResource( (homeDir+"/cfg/blitz.fon").c_str());
+    AddFontResource( (homeDir+"../cfg/blitz.fon").c_str());
 
 	setDefault();
 
@@ -133,7 +133,7 @@ void Prefs::close(){
 		out<<"file_recent\t"<<recentFiles[k]<<endl;
 	}
 
-	RemoveFontResource( (homeDir+"/cfg/blitz.fon").c_str() );
+	RemoveFontResource( (homeDir+"../cfg/blitz.fon").c_str() );
 }
 
 void Prefs::setDefault(){
@@ -159,7 +159,7 @@ void Prefs::setDefault(){
     font_window="Verdana";
     font_window_height=10;
 
-    rgb_bkgrnd=RGB( 0x22,0x55,0x88 );
+    rgb_bkgrnd=RGB( 0x00,0x00,0x00 );
     rgb_string=RGB( 0x00,0xff,0x66 );
     rgb_ident=RGB( 0xff,0xff,0xff );
     rgb_keyword=RGB( 0xaa,0xff,0xff );
