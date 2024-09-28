@@ -87,7 +87,7 @@ BBStr *bbReadLine( bbStream *s ){
 }
 
 void bbWriteByte( bbStream *s,int n ){
-	if( !debugStream( s,"ReadLine" )) return d_new BBStr("");
+	if( !debugStream( s,"WriteByte" )) return;
 	s->write( (char*)&n,1 );
 }
 

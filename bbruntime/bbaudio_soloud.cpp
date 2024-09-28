@@ -12,13 +12,13 @@ namespace {
 	inline bool debugSound(Sound *sound,const char* a) {
 		if (::debug)
 		{
-			if sounds.find(sound) == sounds.end()
+			if (sounds.find(sound) == sounds.end())
 			{
 				RTEX("Sound does not exist"); // NOLINT
 				return false;
 			}
 		} else {
-			if sounds.find(sound) == sounds.end()
+			if (sounds.find(sound) == sounds.end())
 			{
 				errorLog.push_back(std::string(a)+std::string(": Sound does not exist"));
 				return false;
@@ -30,13 +30,13 @@ namespace {
 	inline bool debugChannel(uint32_t channel,const char* a) {
 		if (::debug)
 		{
-			if !soloud
+			if (!soloud)
 			{
 				RTEX("Soloud has not been initialized"); // NOLINT
 				return false;
 			}
 		} else {
-			if !soloud
+			if (!soloud)
 			{
 				errorLog.push_back(std::string(a)+std::string(": Soloud has not been initialized"));
 				return false;
@@ -133,7 +133,7 @@ uint32_t bbPlaySound(Sound *sound) {
 uint32_t bbPlay3dSound(Sound *sound, float x, float y, float z, float vx, float vy, float vz) {
 	if (!sound) return 0;
 	if (!debugSound( sound, "Play3dSound" )) return 0;
-	debugSound(sound);
+	debugSound(sound,"Play3dSound");
 	sound->wav.set3dAttenuation(SoLoud::AudioSource::INVERSE_DISTANCE, rolloffFactor);
 	sound->wav.set3dDopplerFactor(dopplerFactor);
 	if (sound->pitch) {

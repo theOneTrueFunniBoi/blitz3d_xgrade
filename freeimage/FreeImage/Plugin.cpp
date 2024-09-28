@@ -486,7 +486,7 @@ FreeImage_RegisterLocalPlugin(FI_InitProc proc_address, const char *format, cons
 	return s_plugins->AddNode(proc_address, NULL, format, description, extension, regexpr);
 }
 
-FREE_IMAGE_FORMAT DLL_CALLCONV
+/*FREE_IMAGE_FORMAT DLL_CALLCONV
 FreeImage_RegisterExternalPlugin(const char *path, const char *format, const char *description, const char *extension, const char *regexpr) {
 	if (path != NULL) {
 		HINSTANCE instance = LoadLibrary(path);
@@ -504,7 +504,7 @@ FreeImage_RegisterExternalPlugin(const char *path, const char *format, const cha
 	}
 
 	return FIF_UNKNOWN;
-}
+}*/
 
 int DLL_CALLCONV
 FreeImage_SetPluginEnabled(FREE_IMAGE_FORMAT fif, BOOL enable) {

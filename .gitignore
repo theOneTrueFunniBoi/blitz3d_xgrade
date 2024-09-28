@@ -2,6 +2,9 @@
 cmake-build-*
 Blitz3D-V*
 
+git.txt
+build.txt
+
 BLITZ3D_INSTALL/Blitz3D.exe
 BLITZ3D_INSTALL/bin/blitzcc.exe
 BLITZ3D_INSTALL/bin/debugger.dll

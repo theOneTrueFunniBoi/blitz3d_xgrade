@@ -535,7 +535,7 @@ void gxScene::setRenderState( const RenderState &rs ){
 		setTSS( n_texs,D3DTSS_COLOROP,D3DTOP_DISABLE );
 		setTSS( n_texs,D3DTSS_ALPHAOP,D3DTOP_DISABLE );
 		dir3dDev->SetTexture( n_texs,0 );
-		setTSS( n,D3DTSS_MIPMAPLODBIAS,textureLodBias );
+		setTSS( n_texs,D3DTSS_MIPMAPLODBIAS,textureLodBias );
 	}
 }
 

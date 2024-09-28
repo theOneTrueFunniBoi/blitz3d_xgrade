@@ -1225,7 +1225,7 @@ void  bbCameraFogMode( Camera *c,int mode ){
 }
 
 int  bbCameraProject( Camera *c,float x,float y,float z ){
-	if (!debugCamera(c,"CameraFogMode")) return;
+	if (!debugCamera(c, "CameraProject")) return 0;
 	Vector v=-c->getWorldTform()*Vector(x,y,z);
 	const Frustum &f=c->getFrustum();
 	if( c->getProjMode()==Camera::PROJ_ORTHO ){
@@ -1598,7 +1598,7 @@ Entity *  bbLoadTerrain( BBStr *file,Entity *p ){
 }
 
 void  bbTerrainDetail( Terrain *t,int n,int m ){
-	if (!debugParent(p,"LoadTerrain")) return 0;
+	if (!debugTerrain(t,"TerrainDetail")) return;
 	t->setDetail( n,!!m );
 }
 
