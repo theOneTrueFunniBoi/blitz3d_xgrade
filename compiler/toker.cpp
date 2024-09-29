@@ -69,7 +69,6 @@ static void makeKeywords(){
 	alphaTokes["Insert"]=INSERT;
 	alphaTokes["Before"]=BEFORE;
 	alphaTokes["After"]=AFTER;
-	alphaTokes["Null"]=BBNULL;
 	alphaTokes["Object"]=OBJECT;
 	alphaTokes["Handle"]=BBHANDLE;
 
@@ -80,6 +79,7 @@ static void makeKeywords(){
 	alphaTokes["Shl"]=SHL;
 	alphaTokes["Shr"]=SHR;
 	alphaTokes["Sar"]=SAR;
+	alphaTokes["Null"]=NULLCONST;
 
 	map<string,int>::const_iterator it;
 	for( it=alphaTokes.begin();it!=alphaTokes.end();++it ){

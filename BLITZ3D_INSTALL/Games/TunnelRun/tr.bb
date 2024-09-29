@@ -63,7 +63,7 @@ Go2_timer=0
 Game_Counter=0
 
 dummy=CreatePivot()
-Listen=CreateListener(dummy,.001,10,5)
+Listen=GetListener(dummy,.001,10,5)
 While Exited=False
 Game_Counter=Game_Counter+1
 	Cls

@@ -1,7 +1,7 @@
 ;EdzUp Asteroids
 ;Written by EdzUp of Stonegoat Software
 
-Graphics3D 640,480,16
+Graphics3D 640,480,16,2
 SetBuffer BackBuffer()
 
 SeedRnd MilliSecs()      ;setup random numbers

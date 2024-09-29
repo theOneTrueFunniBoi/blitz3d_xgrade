@@ -2,7 +2,7 @@
 cmake-build-*
 Blitz3D-V*
 
-*.bb_bak*
+*_bak*
 *_old.*
 
 git.txt

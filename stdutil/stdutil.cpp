@@ -201,7 +201,11 @@ string ftoa( float n ){
 //		if ( digits < 1 ) digits = 1;	// less than one digit is nonsense
 //		if ( digits > 8 ) digits = 8;	// practical maximum for float
 		
-		t = _ecvt( n, digits, &dec, &sign );
+		//t = _ecvt( n, digits, &dec, &sign );
+		char* tmp = new char[64];
+		errno_t err = _ecvt_s(tmp, 64, n, digits, &dec, &sign);
+		t = tmp;
+		delete[] tmp;
 
 		if ( dec <= eNeg + 1 || dec > ePos ){
 

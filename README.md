@@ -28,11 +28,19 @@ Assuming all went well, the project files should be built, and can be found in t
 
 #### LibOGG
 
-Download libogg to "mavless_soloud\libogg", and compile static libs.
+Download libogg to "mavless_soloud\libogg".
+
+Next, in "ogg.h", be sure to manually define every function as "__cdecl".
+
+Finally, compile static libs.
 
 #### LibVorbis
 
-Download libvorbis to "mavless_soloud\libvorbis", and compile static libs.
+Download libvorbis to "mavless_soloud\libvorbis".
+
+Next, in "vorbisfile.h", be sure to manually define every function as "__cdecl".
+
+Finally, compile static libs.
 
 #### OpenAL 1.1 SDK
 
@@ -54,7 +62,7 @@ cmake --build cmake-build-release --config Release
 Assuming all went well, the "BLITZ3D_INSTALL" directory will contain the final binaries, simply run "SoLoud-MAVLess.exe" to get blitzing!
 
 ### To disable Ogg Vorbis
-Open <CMakeLists.txt>
+Open "CMakeLists.txt"
 and change
 ``` shell
 option(BB_OGG_ENABLED "Blitz3D Ogg Vorbis build enabled" ON)

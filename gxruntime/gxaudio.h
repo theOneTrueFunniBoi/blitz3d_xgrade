@@ -3,11 +3,12 @@
 #define GXAUDIO_H
 
 #include <string>
+#include <set>
 
 #include "gxsound.h"
 
-#include <alc.h>
-#include <al.h>
+//#include <alc.h>
+//#include <al.h>
 
 //#if BB_OGG_ENABLED
 //#include <fmod375/include/fmod.h>
@@ -24,9 +25,12 @@ public:
 	gxAudio( gxRuntime *runtime );
 	~gxAudio();
 
+	std::set<gxSound*> sound_set;
+
 	//sample = buffer
-	gxChannel* play(ALuint sample, bool loop);
-	gxChannel* play3d(ALuint sample, bool loop, const float pos[3], const float vel[3]);
+	bool reserveChannel(gxChannel* channel);
+	void clearRelatedChannels(gxSound *sound);
+	bool verifyChannel(gxChannel* chan);
 
 	/*void pause();
 	void resume();*/
@@ -45,14 +49,10 @@ private:
 	float listenerVel[3];
 	/***** GX INTERFACE *****/
 public:
-	enum{
-		CD_MODE_ONCE=1,CD_MODE_LOOP,CD_MODE_ALL
-	};
-
-	gxSound *loadSound( const std::string &filename,bool use_3d );
-	bool loadOGG(const std::string& filename, std::vector<char>& buffer, ALenum& format, ALsizei& freq, bool isPanned);
+	//gxSound *loadSound( const std::string &filename,bool use_3d );
+	//bool loadOGG(const std::string& filename, std::vector<char>& buffer, ALenum& format, ALsizei& freq, bool isPanned);
 	gxSound *verifySound( gxSound *sound );
-	void freeSound( gxSound *sound );
+	//void freeSound( gxSound *sound );
 
 	//void setPaused( bool paused );	//master pause
 	//void setVolume( float volume );	//master volume
@@ -64,6 +64,7 @@ public:
 	const float* get3dListenerPos();
 	const float* get3dListenerTarget();
 	const float* get3dListenerUp();
+	const float* get3dListenerVel();
 };
 
 #endif

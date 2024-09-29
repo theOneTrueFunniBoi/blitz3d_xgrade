@@ -162,7 +162,7 @@ Function UpdateGame()
 			
 			MoveMouse c\mmx,c\mmy
 			
-			If MouseDown(2) And c\fall=False Then c\g=c\jstrength#:PlaySound snd(3)
+			If MouseDown(2) And c\fall=False Then c\g=c\jstrength#:PlaySound(snd(3))
 			
 			PositionEntity c\gun,EntityX(c\gun),EntityY(c\gun),c\gzz+3
 			
@@ -194,7 +194,6 @@ Function UpdateGame()
 			c\ay = c\ay - (KeyDown(Right)-KeyDown(Left))
 			
 		EndIf
-		
 		
 		If KeyHit(2) Then ScaleEntity c\pent,12,30,12
 		

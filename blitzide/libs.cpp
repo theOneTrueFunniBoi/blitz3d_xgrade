@@ -61,7 +61,7 @@ int version( string vers,string t ){
 				v |= 0x30000;
 			} else if (b == "soloud") {
 				v |= 0x20000;
-			} else if (b == "fmod") {
+			} else if (b == "openal") {
 				v |= 0x10000;
 			}
 		}
