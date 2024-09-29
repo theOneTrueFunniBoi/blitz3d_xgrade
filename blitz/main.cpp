@@ -127,7 +127,7 @@ static string verstr( int ver ){
 	}else if(ver>>16==2){
 		b="SoLoud";
 	}else if(ver>>16==1){
-		b="FMOD";
+		b="OpenAL";
 	}
 	return itoa((ver&0xffff)/100)+"."+itoa((ver&0xffff)%100)+":"+b;
 }
