@@ -11,7 +11,7 @@ You will also need to install the following optional MSVC components:
 "Desktop Development with C++",
 "Windows Universal CRT SDK",
 "C++ MFC for [VERSION] build tools with Spectre Mitigations (x86 & x64)",
-"ASP.NAT and web development prerequisites"
+"ASP.NET and web development prerequisites"
 ```
 
 Then, from a shell/DOS prompt:
@@ -27,14 +27,19 @@ Assuming all went well, the project files should be built, and can be found in t
 ### Build Prerequisites
 
 #### LibOGG
+
 Download libogg to "mavless_soloud\libogg", and compile static libs.
 
 #### LibVorbis
+
 Download libvorbis to "mavless_soloud\libvorbis", and compile static libs.
 
 #### OpenAL 1.1 SDK
+
 Download & Install the OpenAL 1.1 SDK to "mavless_soloud\openal1.1".
+
 Next, naviagate to "C:\Windows\SysWOW64\" (for x86 users: "C:\Windows\System32\"), and copy the file "OpenAL32.dll".
+
 Finally, paste "OpenAL32.dll" into "mavless_soloud\openal1.1".
 
 ### Building SoLoud MAV-Less
