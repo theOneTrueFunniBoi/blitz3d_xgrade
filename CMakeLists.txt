@@ -9,19 +9,19 @@ option(BB_LIBSGD_ENABLED "Blitz3D LibSGD build enabled" OFF)
 option(BB_OGG_ENABLED "Blitz3D Ogg build enabled" ON)
 
 if (NOT (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC"))
-	message(FATAL_ERROR "Blitz3D must be built using MSVC.")
+	message(FATAL_ERROR "Blitz3D MUST be built using MSVC.")
 endif ()
 
 if (NOT (CMAKE_SIZEOF_VOID_P EQUAL 4))
-	message(FATAL_ERROR "Blitz3D must be built in 32 bit mode: Pass '-DCMAKE_GENERATOR_PLATFORM=Win32' to cmake when configuring.")
+	message(FATAL_ERROR "Blitz3D MUST be built in 32 bit mode (cringe i know): Pass '-DCMAKE_GENERATOR_PLATFORM=Win32' to cmake when configuring.")
 endif ()
 
 if(BB_LIBSGD_ENABLED AND BB_OGG_ENABLED)
-	message(FATAL_ERROR "Blitz3D FMOD builds not available in LibSGD builds.")
+	message(FATAL_ERROR "Blitz3D OGG builds and LibSGD builds cannot be combined.")
 endif()
 
 message(STATUS "### Configuring Blitz3D build for build type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "### IsBB-LibSG: ${BB_LIBSGD_ENABLED}")
+message(STATUS "### IsBB-LibSGD: ${BB_LIBSGD_ENABLED}")
 message(STATUS "### IsBB-OggVorbis: ${BB_OGG_ENABLED}")
 
 if(BB_LIBSGD_ENABLED)
