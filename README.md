@@ -1,29 +1,63 @@
-## Blitz3D SoLoud - MAVLess Edition
+## Blitz3D SoLoud: MAV-Less Edition
 
-This is a fork of BlitzResearch' Blitz3D SoLoud Edition which implements juanjp600's MAVLess Patch
+This is a fork of BlitzResearch' Blitz3D: SoLoud Edition which implements juanjp600's MAV-Less/FastExt Killer/OpenAL Patches
 
-### Building SoLoud MAVLess from source
+### Setting up SoLoud MAV-Less Project Files
 
-You will need to install Microsoft Visual Studio, and the CMake and Git utilities. Any recent version of MSVC should be OK, I am currently using Community Edition 2022.
+You will need to install Microsoft Visual Studio, and the CMake and Git utilities. Any recent version of MSVC should work, although the latest version of Community Edition 2022 is reccomended.
 
-You will also need to install the following optional MSVC components: "Desktop development with C++", "MFC and ATL support" and "ASP.NET and web development".
+You will also need to install the following optional MSVC components:
+``` shell
+"Desktop Development with C++",
+"Windows Universal CRT SDK",
+"C++ MFC for [VERSION] build tools with Spectre Mitigations (x86 & x64)",
+"ASP.NAT and web development prerequisites"
+```
 
-Then, from a DOS prompt:
+Then, from a shell/DOS prompt:
 
 ``` shell
 git clone https://github.com/theOneTrueFunniBoi/mavless_soloud.git
 cd mavless_soloud
 cmake -S . -B cmake-build-release -A Win32 -G "Visual Studio 17 2022"
+```
+
+Assuming all went well, the project files should be built, and can be found in the "cmake-build-release" folder.
+
+### Build Prerequisites
+
+#### LibOGG
+Download libogg to "mavless_soloud\libogg", and compile static libs.
+
+#### LibVorbis
+Download libvorbis to "mavless_soloud\libvorbis", and compile static libs.
+
+#### OpenAL 1.1 SDK
+Download & Install the OpenAL 1.1 SDK to "mavless_soloud\openal1.1".
+Next, naviagate to "C:\Windows\SysWOW64\" (for x86 users: "C:\Windows\System32\"), and copy the file "OpenAL32.dll".
+Finally, paste "OpenAL32.dll" into "mavless_soloud\openal1.1".
+
+### Building SoLoud MAV-Less
+
+Simply open "Blitz3D.sln" and build the solution!
+
+Or you could run the following shell/DOS command:
+``` shell
 cmake --build cmake-build-release --config Release
 ```
-Assuming all went well, the BLITZ3D_INSTALL directory will contain the final binaries, simply run Blitz3D.exe to get blitzing!
+
+Assuming all went well, the "BLITZ3D_INSTALL" directory will contain the final binaries, simply run "SoLoud-MAVLess.exe" to get blitzing!
 
 ### To disable Ogg Vorbis
 Open <CMakeLists.txt>
 and change
-`option(BB_FMOD_ENABLED "Blitz3D Ogg Vorbis build enabled" ON)`
+``` shell
+option(BB_OGG_ENABLED "Blitz3D Ogg Vorbis build enabled" ON)
+```
 to
-`option(BB_FMOD_ENABLED "Blitz3D Ogg Vorbis build enabled" OFF)`
+``` shell
+option(BB_OGG_ENABLED "Blitz3D Ogg Vorbis build enabled" OFF)
+```
 
 ### Too lazy to build?
 

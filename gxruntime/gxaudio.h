@@ -9,7 +9,7 @@
 #include <alc.h>
 #include <al.h>
 
-//#if BB_FMOD_ENABLED
+//#if BB_OGG_ENABLED
 //#include <fmod375/include/fmod.h>
 //#include <openal1.1/include/al.h>
 //#endif

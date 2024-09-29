@@ -41,7 +41,7 @@ if (BB_BLITZ3D_ENABLED)
 		gxscene.cpp
 		gxscene.h
 	)
-    if(BB_FMOD_ENABLED)
+    if(BB_OGG_ENABLED)
         set(SRCS ${SRCS}
             gxaudio.cpp
             gxaudio.h

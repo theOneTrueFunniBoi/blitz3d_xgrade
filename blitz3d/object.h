@@ -8,7 +8,7 @@
 #include "animator.h"
 #include "collision.h"
 
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 class gxSound;
 #else
 struct Sound;
@@ -46,7 +46,7 @@ public:
 	void setAnimation( const Animation &t ){ anim=t; }
 	void setAnimator( Animator *t );
 
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 	gxChannel *emitSound( gxSound *sound );
 #else
 	uint32_t emitSound(Sound* sound);
@@ -90,7 +90,7 @@ private:
 	bool obscurer;
 	float elapsed;
 	Vector velocity;
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 	vector<gxChannel*> channels;
 #else
 	vector<uint32_t> channels;

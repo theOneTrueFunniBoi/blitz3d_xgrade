@@ -1666,7 +1666,7 @@ Entity* bbGetListener(Entity* p, float roll, float dopp, float dist) {
 	return listener;
 }
 
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 gxChannel *  bbEmitSound( gxSound *sound,Object *o )
 #else
 uint32_t bbEmitSound( Sound *sound,Object *o )

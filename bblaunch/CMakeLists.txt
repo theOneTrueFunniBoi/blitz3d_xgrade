@@ -10,4 +10,4 @@ add_executable(bblaunch WIN32
 
 target_compile_options(bblaunch PRIVATE /Gz)
 
-copy_exe_to_install(bblaunch Blitz3D)
+copy_exe_to_install(bblaunch SoLoud-MAVLess)

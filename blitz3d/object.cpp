@@ -140,7 +140,7 @@ const Transform &Object::getPrevWorldTform()const{
 	return prev_tform;
 }
 
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 
 gxChannel *Object::emitSound( gxSound *sound ){
 	if( !sound ) return 0;
@@ -177,7 +177,7 @@ uint32_t Object::emitSound(Sound* sound){
 #endif
 
 void Object::updateSounds(){
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 	for( int k=0;k<channels.size();++k ){
 		if( auto chan=channels[k] ){
 			if( chan->isPlaying() )	chan->set3d( &getWorldTform().v.x,&velocity.x );

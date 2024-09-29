@@ -40,7 +40,7 @@ if (BB_BLITZ3D_ENABLED)
 	)
     set(LIBS gxruntime blitz3d)
 
-    if(BB_FMOD_ENABLED)
+    if(BB_OGG_ENABLED)
         set(SRCS ${SRCS}
             bbaudio.cpp
             bbaudio.h

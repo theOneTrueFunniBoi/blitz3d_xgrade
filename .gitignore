@@ -16,7 +16,7 @@ openal1.1/*
 libogg/*
 libvorbis/*
 
-BLITZ3D_INSTALL/Blitz3D.exe
+BLITZ3D_INSTALL/SoLoud-MAVLess.exe
 BLITZ3D_INSTALL/bin/*
 BLITZ3D_INSTALL/cfg/blitzide.prefs
 BLITZ3D_INSTALL/tmp/*.bb

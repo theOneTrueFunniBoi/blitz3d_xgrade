@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 #include "gxaudio.h"
 #endif
 #include "gxinput.h"
@@ -23,7 +23,7 @@ public:
 	HWND hwnd;
 	HINSTANCE hinst;
 
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 	gxAudio *audio;
 #endif
 	gxInput *input;
@@ -122,7 +122,7 @@ public:
 
 	void windowedModeInfo( int *caps );
 
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 	gxAudio *openAudio( int flags );
 	void closeAudio( gxAudio *audio );
 #endif

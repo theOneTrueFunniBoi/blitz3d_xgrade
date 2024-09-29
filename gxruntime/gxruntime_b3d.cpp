@@ -117,7 +117,7 @@ void gxRuntime::closeRuntime( gxRuntime *r ){
 gxRuntime::gxRuntime( HINSTANCE hi,const string &cl,HWND hw ):
 		hinst(hi),cmd_line(cl),hwnd(hw),curr_driver(0),enum_all(false),
 		pointer_visible(true),
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 		audio(0),
 #endif
 		input(0),graphics(0),fileSystem(0),use_di(false){
@@ -136,7 +136,7 @@ gxRuntime::gxRuntime( HINSTANCE hi,const string &cl,HWND hw ):
 
 gxRuntime::~gxRuntime(){
 	while( timers.size() ) freeTimer( *timers.begin() );
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 	if( audio ) closeAudio( audio );
 #endif
 	if( graphics ) closeGraphics( graphics );
@@ -152,13 +152,13 @@ gxRuntime::~gxRuntime(){
 }
 
 /*void gxRuntime::pauseAudio() {
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 	if( audio ) audio->pause();
 #endif
 }
 
 void gxRuntime::resumeAudio(){
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 	if( audio ) audio->resume();
 #endif
 }*/
@@ -667,7 +667,7 @@ void gxRuntime::setPointerVisible( bool vis ){
 /////////////////
 // AUDIO SETUP //
 /////////////////
-#if BB_FMOD_ENABLED
+#if BB_OGG_ENABLED
 gxAudio *gxRuntime::openAudio( int flags ){
 	if( audio ) return nullptr;
 
