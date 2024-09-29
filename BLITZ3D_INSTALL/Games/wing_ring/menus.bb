@@ -65,7 +65,7 @@ Function InitMenus()
 	CloseFile load_file
 
 	; Play music
-	music=PlayMusic("media\tune1.mid")
+	;music=PlayMusic("media\tune1.mid")
 
 End Function
 

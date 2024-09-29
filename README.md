@@ -18,6 +18,13 @@ cmake --build cmake-build-release --config Release
 ```
 Assuming all went well, the BLITZ3D_INSTALL directory will contain the final binaries, simply run Blitz3D.exe to get blitzing!
 
+### To disable Ogg Vorbis
+Open <CMakeLists.txt>
+and change
+`option(BB_FMOD_ENABLED "Blitz3D Ogg Vorbis build enabled" ON)`
+to
+`option(BB_FMOD_ENABLED "Blitz3D Ogg Vorbis build enabled" OFF)`
+
 ### Too lazy to build?
 
 Well sorry, you're fresh outta luck! No pre-built builds available just yet...

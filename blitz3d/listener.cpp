@@ -12,11 +12,16 @@ void bbSet3dListener(float x,float y, float z, float kx, float ky, float kz, flo
 Listener::Listener( float roll,float dopp,float dist ){
 #if BB_FMOD_ENABLED
 	if( !gx_audio ) return;
-	gx_audio->set3dOptions( roll,dopp,dist );
+	//gx_audio->set3dOptions( roll,dopp,dist );
+	set(roll, dopp, dist);
 #else
 	bbSet3dListenerConfig(roll,dopp,dist);
 #endif
 	renderListener();
+}
+
+void Listener::set(float roll, float dopp, float dist) {
+	gx_audio->set3dOptions(roll, dopp, dist);
 }
 
 Listener::Listener( const Listener &t ):

@@ -70,8 +70,8 @@ private:
 	void denumGfx();
 
 	void resetInput();
-	void pauseAudio();
-	void resumeAudio();
+	//void pauseAudio();
+	//void resumeAudio();
 	void backupGraphics();
 	void restoreGraphics();
 	void acquireInput();
@@ -106,7 +106,7 @@ public:
 	std::string systemProperty( const std::string &t );
 
 	void debugStop();
-	void debugProfile( int per );
+	//void debugProfile( int per );
 	void debugStmt( int pos,const char *file );
 	void debugEnter( void *frame,void *env,const char *func );
 	void debugLeave();

@@ -13,7 +13,7 @@
 
 AppTitle "Wing Ring V1.0"
 
-Global width=640,height=480,depth=16,mode=1
+Global width=640,height=480,depth=16,mode=2
 Graphics3D width,height,depth,mode
 SetBuffer BackBuffer()
 
@@ -453,7 +453,7 @@ Function StartGame()
 
 	SetFont large_font
 	StopChannel music
-	music=PlayMusic("tune2.mid")
+	;music=PlayMusic("tune2.mid")
 	
 	time=MilliSecs()-period
 
@@ -519,7 +519,7 @@ Function EndGame()
 
 	SetFont small_font
 	StopChannel music
-	music=PlayMusic("tune1.mid")
+	;music=PlayMusic("tune1.mid")
 
 	FlushKeys
 

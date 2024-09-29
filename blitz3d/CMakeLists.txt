@@ -86,6 +86,8 @@ target_compile_options(blitz3d PRIVATE /Gz)
 set(LIBS gxruntime ${CMAKE_CURRENT_SOURCE_DIR}/minidx9/lib/d3dxof.lib)
 if(NOT BB_FMOD_ENABLED)
 set(LIBS ${LIBS} soloud)
+else()
+set(LIBS ${LIBS} openal1.1)
 endif()
 
 target_link_libraries(blitz3d ${LIBS})

@@ -2,8 +2,19 @@
 cmake-build-*
 Blitz3D-V*
 
+*.bb_bak*
+*_old.*
+
 git.txt
 build.txt
+
+rtpHarry Sokoban master libraries-OpenAL 1.1 SDK.zip
+vorbis-master.zip
+libogg-master.zip
+
+openal1.1/*
+libogg/*
+libvorbis/*
 
 BLITZ3D_INSTALL/Blitz3D.exe
 BLITZ3D_INSTALL/bin/blitzcc.exe
@@ -13,5 +24,8 @@ BLITZ3D_INSTALL/bin/linker.dll
 BLITZ3D_INSTALL/bin/runtime.dll
 BLITZ3D_INSTALL/cfg/blitzide.prefs
 BLITZ3D_INSTALL/tmp/*.bb
+BLITZ3D_INSTALL/userlibs/*.dll
+BLITZ3D_INSTALL/userlibs/*.decls
+BLITZ3D_INSTALL/userlibs/*.lib
 
 BLITZ3D_RELEASES

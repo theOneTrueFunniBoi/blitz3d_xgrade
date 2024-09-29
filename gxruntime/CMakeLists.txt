@@ -50,6 +50,7 @@ if (BB_BLITZ3D_ENABLED)
             gxsound.cpp
             gxsound.h
         )
+	set(LIBS libogg libvorbis openal1.1)
     endif()
 elseif(BB_LIBSGD_ENABLED)
     set(SRCS ${SRCS}
@@ -62,7 +63,7 @@ add_library(gxruntime ${SRCS})
 
 target_compile_options(gxruntime PRIVATE /Gz)
 
-set(LIBS stdutil winmm Ws2_32.lib)
+set(LIBS ${LIBS} stdutil winmm Ws2_32.lib)
 
 if (BB_BLITZ3D_ENABLED)
 	set(LIBS ${LIBS} freeimage amstrmid dinput8 dxguid ddraw)

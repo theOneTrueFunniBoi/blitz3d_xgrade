@@ -207,7 +207,7 @@ void MainFrame::OnDestroy(){
 }
 
 void MainFrame::setTitle( const string &s ){
-	SetWindowText( ("Blitz3D - "+s ).c_str() );
+	SetWindowText( ("Blitz3D SoLoud: MAV-Less - "+s ).c_str() );
 }
 
 void MainFrame::OnClose(){
@@ -240,6 +240,7 @@ void MainFrame::OnSize( UINT type,int sw,int sh ){
 static char *bbFilter=
 
 "Blitz Basic files (.bb)|*.bb|"
+"INI Configuration files (.ini)|*.ini|"
 "Image files (.bmp,.jpg,.png,.tga,.iff,.pcx)|*.bmp;*.jpg;*.png;*.tga;*.iff;*.pcx|"
 "Audio files (.wav,.mid,.mod,.mp3,.s3m,.xm,.it,.rmi,.sgt)|*.wav;*.mid;*.mod;*.mp3;*.s3m;*.xm;*.it;*.rmi;*.sgt|"
 "3D Mesh files (.x,.3ds,.md2)|*.x;*.3ds;*.md2|"
@@ -742,7 +743,9 @@ void MainFrame::programPublish(){
 	if( prefs.prg_debug ){
 		string t=
 		"You currently have the debugging feature enabled!\n\n"
-		"This will result in slower executables - continue anyway?";
+		"This will result in SLOWER EXECUTABLES,\n"
+		"and may result in LAG and HIGH MEMORY USAGE!\n\n"
+		"Are you sure you want to continue anyways?";
 		if( MessageBox( t.c_str(),0,MB_OKCANCEL )==IDCANCEL ) return;
 	}
 	build( false,true );
@@ -779,12 +782,15 @@ void MainFrame::helpHome(){
 	HtmlHelp *h=findHelp();
 	string t;
 	t="index.html";
-	h->Navigate( (prefs.homeDir+"/../help/"+t).c_str() );
+	h->Navigate( (prefs.homeDir+"/help/"+t).c_str() );
 }
 
 void MainFrame::helpAutodoc(){
 	HtmlHelp *h=findHelp();
-	h->Navigate( (prefs.homeDir+"/../help/autodoc.html").c_str() );
+	//string t;
+	//t = "index.html";
+	//h->Navigate((prefs.homeDir + "/help/" + t).c_str());
+	h->Navigate( (prefs.homeDir+"/help/autodoc.html").c_str() );
 }
 
 void MainFrame::helpBack(){

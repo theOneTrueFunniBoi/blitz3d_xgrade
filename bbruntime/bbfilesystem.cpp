@@ -30,6 +30,7 @@ struct bbFile : public bbStream{
 static set<bbFile*> file_set;
 
 static inline bool debugFile( bbFile *f,const char* a ){
+	if (file_set.count(f)) return true;
 	if( debug ){
 		RTEX( "File does not exist" );
 	} else {
@@ -39,6 +40,7 @@ static inline bool debugFile( bbFile *f,const char* a ){
 }
 
 static inline bool debugDir( gxDir *d,const char* a ){
+	if (gx_filesys->verifyDir(d)) return true;
 	if( debug ){
 		RTEX( "Directory does not exist" );
 	} else {

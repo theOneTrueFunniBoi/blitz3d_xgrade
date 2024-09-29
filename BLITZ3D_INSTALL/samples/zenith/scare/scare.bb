@@ -56,7 +56,7 @@ LightRange c\light,50
 
 
 Dim snd(5)
-snd(3)=LoadSound("sounds\jump1.wav")
+snd(3)=LoadSound("sounds\StepMetal1.ogg")
 
 te=LoadTexture("models\pistol\gun.png")
 t2=LoadTexture("models\pistol\g1.png",67)

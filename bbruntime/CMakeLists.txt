@@ -45,7 +45,7 @@ if (BB_BLITZ3D_ENABLED)
             bbaudio.cpp
             bbaudio.h
         )
-        set(LIBS ${LIBS} fmod375)
+        set(LIBS ${LIBS} openal1.1)
     else()
         set(SRCS ${SRCS}
            bbaudio_soloud.cpp
