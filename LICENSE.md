@@ -1,3 +1,5 @@
+## Blitz3D License
+
 Blitz3d is released under the zlib/libpng license.
 
 The zlib/libpng License
