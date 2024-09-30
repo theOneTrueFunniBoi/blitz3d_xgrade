@@ -2262,6 +2262,12 @@ BBStr *bbEntityClass( Entity *e ){
 	return new BBStr(p);
 }
 
+BBStr *bbBlitzVersion()
+{
+	const int major = (VERSION & 0xffff) / 1000, minor = (VERSION & 0xffff) % 1000;
+	return new BBStr(to_string(major)+"."+to_string(minor));
+}
+
 void  bbClearWorld( int e,int b,int t ){
 	if( e ){
 		while( Entity::orphans() ) bbFreeEntity( Entity::orphans() );
@@ -2584,4 +2590,6 @@ void blitz3d_link( void (*rtSym)( const char *sym,void *pc ) ){
 	rtSym( "NameEntity%entity$name",bbNameEntity );
 	rtSym( "$EntityName%entity",bbEntityName );
 	rtSym( "$EntityClass%entity",bbEntityClass );
+
+	rtSym( "$BlitzVersion",bbBlitzVersion );
 }
