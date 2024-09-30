@@ -3,10 +3,13 @@
 #include <cctype>
 #include "toker.h"
 #include "ex.h"
+#include "parser.h"
 
 int Toker::chars_toked;
 
 static map<string,int> alphaTokes,lowerTokes;
+
+bool isComment = false;
 
 static void makeKeywords(){
 	static bool made;
@@ -120,6 +123,8 @@ void Toker::nextline(){
 	curr_toke=0;
 	tokes.clear();
 	if( in.eof() ){
+		//if (isComment) { exception("Multiline Comment missing postfix! Did you forget to add '*/'?"); }
+		if (isComment){ failureType=1; }
 		line.resize(1);line[0]=EOF;
 		tokes.push_back( Toke( EOF,0,1 ) );
 		return;
@@ -130,12 +135,27 @@ void Toker::nextline(){
 
 	for( int k=0;k<line.size(); ){
 		int c=line[k],from=k;
-		if( c=='\n' ){
-			tokes.push_back( Toke( c,from,++k ) );
+		int n = line[k + 1];
+		if ((c == '/' && n == '*') && !isComment) {
+			isComment = true;
+			tmpPos = pos();
+			k+=2;
 			continue;
 		}
-		if( isspace( c ) ){ ++k;continue; }
-		if( c==';' ){
+		if ((c == '*' && n == '/') && isComment) {
+			isComment = false;
+			tmpPos = -1;
+			k += 2;
+			continue;
+		}
+		//if ((c == '*' && n == '/') && !isComment){ exception("Multiline Comment postfix without prefix!"); }
+		if ((c == '*' && n == '/') && !isComment){ failureType = 2; }
+		if (c == '\n') {
+			tokes.push_back(Toke(c, from, ++k));
+			continue;
+		}
+		if( isspace( c ) || isComment ){ ++k;continue; }
+		if( (c==';') || (c == '/' && n == '/')){
 			for( ++k;line[k]!='\n';++k ){}
 			continue;
 		}
@@ -195,7 +215,6 @@ void Toker::nextline(){
 			tokes.push_back( Toke( STRINGCONST,from,k ) );
 			continue;
 		}
-		int n=line[k+1];
 		if( (c=='<'&&n=='>')||(c=='>'&&n=='<') ){
 			tokes.push_back( Toke( NE,from,k+=2 ) );
 			continue;
@@ -211,6 +230,35 @@ void Toker::nextline(){
 		tokes.push_back( Toke( c,from,++k ) );
 	}
 	if( !tokes.size() ) exit(0);
+}
+
+/*void Toker::exception(const string& s) {
+	Parser* parser;
+	throw Ex(s, pos(), parser->incfile);
+	//throw Ex(s, pos(), in);
+}*/
+
+// have to do this because the toker is an introvert and refuses to initiate conversation with the parser,
+// so the parser has to be the one to initiate the conversation
+string Toker::checkFailure()
+{
+	string retType = "";
+	switch (failureType)
+	{
+	case 0:
+		retType = "If you're seeing this, you somehow made failureType greater than 0 while still being 0.";
+		break;
+	case 1:
+		retType = "Multiline Comment missing postfix! Did you forget to add '*/'?";
+		break;
+	case 2:
+		retType = "Multiline Comment postfix without prefix! Did you forget to add '/*'?";
+		break;
+	default:
+		retType = "Undefined Toker Failure!";
+		break;
+	}
+	return retType;
 }
 
 int Toker::next(){

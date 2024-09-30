@@ -17,6 +17,7 @@ public:
 	Parser( Toker &t );
 
 	ProgNode *parse( const string &main );
+	string incfile;
 
 private:
 	enum Dialect {
@@ -27,7 +28,7 @@ private:
 	};
 	Dialect dialect = DIALECT_CLASSIC;
 
-	string incfile;
+	//string incfile;
 	set<string> included;
 	Toker *toker,*main_toker;
 	map<string,DimNode*> arrayDecls;

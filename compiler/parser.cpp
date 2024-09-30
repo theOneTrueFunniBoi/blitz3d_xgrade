@@ -28,6 +28,10 @@ ProgNode *Parser::parse( const string &main ){
 
 	try{
 		stmts=parseStmtSeq( STMTS_PROG );
+		// check again, just in case
+		// 
+		// 30 minutes later: don't need to fucking check again moron
+		// if (toker->failureType > 0) { ex(toker->checkFailure()); };
 		if( toker->curr()!=EOF ) exp( "end-of-file" );
 	}catch( Ex ){
 		delete stmts;delete datas;delete funcs;delete structs;delete consts;
@@ -37,8 +41,15 @@ ProgNode *Parser::parse( const string &main ){
 	return d_new ProgNode( consts,structs,funcs,datas,stmts );
 }
 
-void Parser::ex( const string &s ){
-	throw Ex( s,toker->pos(),incfile );
+void Parser::ex(const string& s) {
+	// there's definately a better way to do this than my retarded code
+	int tmp2Pos = toker->pos();
+	if (toker->failureType == 1)
+	{
+		if (!(toker->tmpPos < 0))
+			tmp2Pos = toker->tmpPos;
+	}
+	throw Ex(s, tmp2Pos, incfile);
 }
 
 void Parser::exp( const string &s ){
@@ -96,6 +107,8 @@ StmtSeqNode *Parser::parseStmtSeq( int scope ){
 
 	dialect = prevDialect;
 
+	// probably better way to do this, but i don't fucking care
+	if (toker->failureType > 0) { ex(toker->checkFailure()); };
 	return stmts.release();
 }
 

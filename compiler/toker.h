@@ -8,6 +8,8 @@
 #ifndef TOKER_H
 #define TOKER_H
 
+//#include "parser.h"
+
 enum{
 	DIM=0x8000,GOTO,GOSUB,EXIT,RETURN,
 	IF,THEN,ELSE,ENDIF,ELSEIF,
@@ -45,15 +47,20 @@ public:
 	static int chars_toked;
 
 	static map<string,int> &getKeywords();
+	string checkFailure();
+	int failureType = 0;
+	int tmpPos = -1;
 
 private:
 	struct Toke{
 		int n,from,to;
 		Toke( int n,int f,int t ):n(n),from(f),to(t){}
 	};
+	//Parser* parser, * main_parser;
 	istream &in;
 	string line;
 	vector<Toke> tokes;
+	//void exception(const string& s);
 	void nextline();
 	int curr_row,curr_toke;
 };
