@@ -15,6 +15,9 @@ libogg-master.zip
 openal1.1/*
 libogg/*
 libvorbis/*
+!openal1.1/CMakeLists.txt
+!libogg/CMakeLists.txt
+!libvorbis/CMakeLists.txt
 
 BLITZ3D_INSTALL/SoLoud-MAVLess.exe
 BLITZ3D_INSTALL/bin/*
