@@ -120,9 +120,19 @@ gxChannel* gxSoundSample::play() {
 	alSourcei(retVal->getALSource(), AL_SOURCE_RELATIVE, AL_TRUE);
 	retVal->setPitch(def_pitch);
 	retVal->setVolume(def_gain);
+	retVal->setPan(def_pan);
 	retVal->setRange(def_range_near, def_range_far);
 	alSourcei(retVal->getALSource(), AL_BUFFER, sample);
 	alSourcePlay(retVal->getALSource());
+	return retVal;
+}
+
+gxChannel* gxSoundSample::getChan() {
+	SampleChannel* retVal = new SampleChannel(this);
+	if (!audio->reserveChannel(retVal)) {
+		delete retVal;
+		return 0;
+	}
 	return retVal;
 }
 
@@ -154,10 +164,10 @@ void gxSoundSample::setVolume( float volume ){
 	def_gain = volume;
 }
 
-/*void gxSound::setPan(float pan) {
+void gxSoundSample::setPan(float pan) {
 	def_pan=(pan+1.0f)*127.5f;
-	defs_valid=false;
-}*/
+	//defs_valid=false;
+}
 
 void gxSoundSample::setRange(float inNear, float inFar) {
 	def_range_near = inNear;
@@ -185,6 +195,7 @@ gxChannel* gxSoundStream::play() {
 	alSourcei(retVal->getALSource(), AL_SOURCE_RELATIVE, AL_TRUE);
 	retVal->setPitch(def_pitch);
 	retVal->setVolume(def_gain);
+	retVal->setPan(def_pan);
 	retVal->setRange(def_range_near, def_range_far);
 	retVal->createThread(filename, is_3d);
 	return retVal;
@@ -203,6 +214,14 @@ gxChannel* gxSoundStream::play() {
 	retVal->createThread(filename, is_3d);
 	return retVal;
 }*/
+gxChannel* gxSoundStream::getChan() {
+	StreamChannel* retVal = new StreamChannel(this);
+	if (!audio->reserveChannel(retVal)) {
+		delete retVal;
+		return 0;
+	}
+	return retVal;
+}
 gxSoundStream* gxSoundStream::load(gxAudio* a, const std::string& name, bool use_3d) {
 	if (tolower(name.substr(name.size() - 4)) != ".ogg")
 	{
@@ -231,6 +250,10 @@ void gxSoundStream::setPitch(float pitch) {
 }
 void gxSoundStream::setVolume(float volume) {
 	def_gain = volume;
+}
+void gxSoundStream::setPan(float pan) {
+	def_pan = (pan + 1.0f) * 127.5f;
+	//defs_valid = false;
 }
 void gxSoundStream::setRange(float inNear, float inFar) {
 	def_range_near = inNear;

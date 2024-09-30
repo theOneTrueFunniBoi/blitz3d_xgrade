@@ -19,6 +19,7 @@ protected:
 	bool def_loop;
 	float def_range_near;
 	float def_range_far;
+	float def_pan;
 	//ALuint sample;
 	float pos[3],vel[3];
 
@@ -28,11 +29,13 @@ protected:
 public:
 	//actions
 	virtual gxChannel* play() = 0;
+	virtual gxChannel* getChan() = 0;
 	//virtual gxChannel* play3d(const float pos[3], const float vel[3]) = 0;
 	//modifiers
 	virtual void setLoop(bool loop) = 0;
 	virtual void setPitch(float pitch) = 0;
 	virtual void setVolume(float volume) = 0;
+	virtual void setPan(float pan) = 0;
 	virtual void setRange(float inNear, float inFar) = 0;
 	//allocation
 	virtual void free() = 0;
@@ -51,6 +54,7 @@ private:
 public:
 	//actions
 	gxChannel *play();
+	gxChannel *getChan();
 	//gxChannel *play3d( const float pos[3],const float vel[3] );
 
 	ALuint getSample();
@@ -59,7 +63,7 @@ public:
 	void setLoop(bool loop);
 	void setPitch(float pitch);
 	void setVolume(float volume);
-	//void setPan( float pan );
+	void setPan( float pan );
 	void setRange(float inNear, float inFar);
 
 	//allocation
@@ -77,11 +81,13 @@ private:
 public:
 	//actions
 	gxChannel* play();
-	gxChannel* play3d(const float pos[3], const float vel[3]);
+	gxChannel* getChan();
+	//gxChannel* play3d(const float pos[3], const float vel[3]);
 	//modifiers
 	void setLoop(bool loop);
 	void setPitch(float pitch);
 	void setVolume(float volume);
+	void setPan(float pan);
 	void setRange(float inNear, float inFar);
 	//allocation
 	static gxSoundStream* load(gxAudio* a, const std::string& filename, bool use_3d);

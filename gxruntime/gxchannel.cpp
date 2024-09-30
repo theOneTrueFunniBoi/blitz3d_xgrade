@@ -45,6 +45,11 @@ void SampleChannel::setPitch(float pitch) {
 void SampleChannel::setVolume(float volume) {
 	alSourcef(source, AL_GAIN, volume);
 }
+void SampleChannel::setPan(float pan) {
+	float sourcePosition[3] = { pan,0.f,0.f };
+	alSourcefv(source, AL_POSITION, sourcePosition);
+	alSourcei(source, AL_SOURCE_RELATIVE, AL_TRUE);
+}
 void SampleChannel::setRange(float inNear, float inFar) {
 	alSourcef(source, AL_REFERENCE_DISTANCE, inNear);
 	alSourcef(source, AL_MAX_DISTANCE, inFar);
@@ -54,6 +59,11 @@ void SampleChannel::set3d(const float pos[3], const float vel[3]) {
 
 	alSource3f(source, AL_POSITION, pos[0], pos[1], pos[2]);
 	alSource3f(source, AL_VELOCITY, vel[0], vel[1], vel[2]);
+}
+ALint SampleChannel::get3d() {
+	ALint *i = 0;
+	alGetSourcei(source, AL_SOURCE_RELATIVE, i);
+	return int(i);
 }
 bool SampleChannel::isPlaying() {
 	ALint state = 0;
@@ -106,6 +116,11 @@ void StreamChannel::setPitch(float pitch) {
 void StreamChannel::setVolume(float volume) {
 	alSourcef(source, AL_GAIN, volume);
 }
+void StreamChannel::setPan(float pan) {
+	float sourcePosition[3] = { pan,0.f,0.f };
+	alSourcefv(source, AL_POSITION, sourcePosition);
+	alSourcei(source, AL_SOURCE_RELATIVE, AL_TRUE);
+}
 void StreamChannel::setRange(float inNear, float inFar) {
 	alSourcef(source, AL_REFERENCE_DISTANCE, inNear);
 	alSourcef(source, AL_MAX_DISTANCE, inFar);
@@ -115,6 +130,11 @@ void StreamChannel::set3d(const float pos[3], const float vel[3]) {
 
 	alSource3f(source, AL_POSITION, pos[0], pos[1], pos[2]);
 	alSource3f(source, AL_VELOCITY, vel[0], vel[1], vel[2]);
+}
+ALint StreamChannel::get3d() {
+	ALint* i = 0;
+	alGetSourcei(source, AL_SOURCE_RELATIVE, i);
+	return int(i);
 }
 bool StreamChannel::isPlaying() {
 	return playing && !markedForDeletion;

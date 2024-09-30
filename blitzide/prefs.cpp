@@ -148,13 +148,13 @@ void Prefs::setDefault(){
     win_rect.right=win_rect.left+w;
     win_rect.bottom=win_rect.top+h;
 
-    win_maximized=false;
+    win_maximized=true;
     win_notoolbar=false;
-    font_editor="Lucida Console";
+    font_editor="Blitz";
     font_editor_height=12;
     font_tabs="Verdana";
     font_tabs_height=10;
-    font_debug="Verdana";
+    font_debug="Blitz";
     font_debug_height=10;
     font_window="Verdana";
     font_window_height=10;

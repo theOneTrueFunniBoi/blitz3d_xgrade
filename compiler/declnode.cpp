@@ -246,7 +246,8 @@ void VectorDeclNode::proto( DeclSeq *d,Environ *env ){
 	vector<int> sizes;
 	for( int k=0;k<exprs->size();++k ){
 		ExprNode *e=exprs->exprs[k]=exprs->exprs[k]->semant( env );
-		ConstNode *c=e->constNode();
+		//ConstNode *c=e->constNode();
+		ExprNode* c = e->constNode();
 		if( !c ) ex( "Blitz array sizes must be constant" );
 		int n=c->intValue();
 		if( n<0 ) ex( "Blitz array sizes must not be negative" );

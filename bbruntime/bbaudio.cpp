@@ -63,11 +63,25 @@ void bbSoundRange(gxSound* sound, float inNear, float inFar) {
 	if (!debugSound(sound, "SoundRange")) return;
 	sound->setRange(inNear, inFar);
 }
-/*void bbSoundPan( gxSound *sound,float pan ){
+void bbSoundPan( gxSound *sound,float pan ){
 	if( !sound ) return;
+	pan = -pan;
+	gxChannel* chan = sound->getChan();
+	if ( chan->get3d() )
+	{
+		if (debug)
+		{
+			RTEX("Manual Panning of 3D Sounds is not supported.");
+			return;
+		}
+		else {
+			errorLog.push_back(std::string("SoundPan: Manual Panning of 3D Sounds is not supported."));
+			return;
+		}
+	}
 	if (!debugSound( sound, "SoundPan" )) return;
 	sound->setPan( pan );
-}*/
+}
 gxChannel* bbPlaySound(gxSound* sound, float x, float y, float z, float vx, float vy, float vz) {
 	if (!sound)
 	{
@@ -119,10 +133,23 @@ void bbChannelPos(gxChannel* channel, float x, float y, float z, float vx, float
 	float vel[3] = { vx,vy,vz };
 	channel->set3d(pos, vel);
 }
-/*void bbChannelPan( gxChannel *channel,float pan ){
+void bbChannelPan( gxChannel *channel,float pan ){
 	if( !channel ) return;
+	pan = -pan;
+	if (channel->get3d())
+	{
+		if (debug)
+		{
+			RTEX("Manual Panning of 3D Sounds is not supported.");
+			return;
+		}
+		else {
+			errorLog.push_back(std::string("ChannelPan: Manual Panning of 3D Sounds is not supported."));
+			return;
+		}
+	}
 	channel->setPan( pan );
-}*/
+}
 int bbChannelPlaying(gxChannel* channel) {
 	if (!gx_audio->verifyChannel(channel)) return 0;
 	return channel ? channel->isPlaying() : 0;
@@ -137,14 +164,14 @@ bool audio_destroy() {
 	return true;
 }
 void audio_link(void(*rtSym)(const char*, void*)) {
-	rtSym("%LoadSound$filename%is3d=1", bbLoadSound);
-	rtSym("%StreamSound$filename%is3d=1", bbStreamSound);
+	rtSym("%LoadSound$filename%is3d=0", bbLoadSound);
+	rtSym("%StreamSound$filename%is3d=0", bbStreamSound);
 	rtSym("FreeSound%sound", bbFreeSound);
 	rtSym("LoopSound%sound%loop=1", bbLoopSound);
 	rtSym("SoundPitch%sound#pitch", bbSoundPitch);
 	rtSym("SoundVolume%sound#volume", bbSoundVolume);
 	rtSym("SoundRange%sound#near#far", bbSoundRange);
-	//rtSym( "SoundPan%sound#pan",bbSoundPan );
+	rtSym("SoundPan%sound#pan", bbSoundPan);
 	rtSym("%PlaySound%sound#x=NaN#y=0#z=0#vx=0#vy=0#vz=0", bbPlaySound);
 	rtSym("StopChannel%channel", bbStopChannel);
 	rtSym("PauseChannel%channel", bbPauseChannel);
@@ -153,6 +180,6 @@ void audio_link(void(*rtSym)(const char*, void*)) {
 	rtSym("ChannelVolume%channel#volume", bbChannelVolume);
 	rtSym("ChannelRange%channel#near#far", bbChannelRange);
 	rtSym("ChannelPos%channel#x#y#z#vx=0#vy=0#vz=0", bbChannelPos);
-	//rtSym( "ChannelPan%channel#pan",bbChannelPan );
+	rtSym("ChannelPan%channel#pan", bbChannelPan);
 	rtSym("%ChannelPlaying%channel", bbChannelPlaying);
 }
