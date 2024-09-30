@@ -5,10 +5,10 @@
 using namespace std;
 
 static const char *bb_err=
-"Unable to run Blitz Basic";
+"Unable to run SoLoud MAV-Less";
 
 static const char *md_err=
-"Your desktop must be in high-colour mode to use Blitz Basic.\n\n"
+"Your desktop must be in high-colour mode to use SoLoud MAV-Less.\n\n"
 "You can change your display settings from the control panel."; 
 
 static string getAppDir(){
@@ -23,7 +23,7 @@ static string getAppDir(){
 }
 
 static void fail( const char *p ){
-    ::MessageBox( 0,p,"Blitz Basic Error",MB_SETFOREGROUND|MB_TOPMOST|MB_ICONERROR );
+    ::MessageBox( 0,p,"Blitz3D SoLoud MAV-Less Error",MB_SETFOREGROUND|MB_TOPMOST|MB_ICONERROR );
     ExitProcess(-1);
 }
 

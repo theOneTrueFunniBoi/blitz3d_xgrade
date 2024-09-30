@@ -2,16 +2,20 @@
 cmake-build-*
 Blitz3D-V*
 
+*_bak*
+*_old.*
+
 git.txt
 build.txt
 
-BLITZ3D_INSTALL/Blitz3D.exe
-BLITZ3D_INSTALL/bin/blitzcc.exe
-BLITZ3D_INSTALL/bin/debugger.dll
-BLITZ3D_INSTALL/bin/ide.exe
-BLITZ3D_INSTALL/bin/linker.dll
-BLITZ3D_INSTALL/bin/runtime.dll
+fmod375/lib/fmod.dll
+
+BLITZ3D_INSTALL/SoLoud-MAVLess.exe
+BLITZ3D_INSTALL/bin/*
 BLITZ3D_INSTALL/cfg/blitzide.prefs
 BLITZ3D_INSTALL/tmp/*.bb
+BLITZ3D_INSTALL/userlibs/*.dll
+BLITZ3D_INSTALL/userlibs/*.decls
+BLITZ3D_INSTALL/userlibs/*.lib
 
 BLITZ3D_RELEASES

@@ -20,7 +20,7 @@ void Prefs::open(){
 
 	homeDir=p;
 
-    AddFontResource( (homeDir+"../cfg/blitz.fon").c_str());
+    AddFontResource( (homeDir+"/cfg/blitz.fon").c_str());
 
 	setDefault();
 
@@ -133,7 +133,7 @@ void Prefs::close(){
 		out<<"file_recent\t"<<recentFiles[k]<<endl;
 	}
 
-	RemoveFontResource( (homeDir+"../cfg/blitz.fon").c_str() );
+	RemoveFontResource( (homeDir+"/cfg/blitz.fon").c_str() );
 }
 
 void Prefs::setDefault(){
@@ -150,11 +150,11 @@ void Prefs::setDefault(){
 
     win_maximized=false;
     win_notoolbar=false;
-    font_editor="Lucida Console";
+    font_editor="Blitz";
     font_editor_height=12;
     font_tabs="Verdana";
     font_tabs_height=10;
-    font_debug="Verdana";
+    font_debug="Blitz";
     font_debug_height=10;
     font_window="Verdana";
     font_window_height=10;

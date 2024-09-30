@@ -30,8 +30,8 @@ using namespace std;
 
 static void showInfo(){
 	const int major=(VERSION&0xffff)/1000,minor=(VERSION&0xffff)%1000;
-	cout<<"BlitzCC V"<<major<<"."<<minor<<endl;
-	cout<<"(C)opyright 2000-2003 Blitz Research Ltd"<<endl;
+	cout<<"BlitzCC MAV-Less v"<<major<<"."<<minor<<endl;
+	cout<<"(C)opyright 2000-2024 Blitz Research Ltd"<<endl;
 }
 
 static void showUsage(){
