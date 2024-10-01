@@ -4,7 +4,11 @@ Added MAV-Less Error Checking (might replace with stacktrace).
 
 Added new BlitzVersion keyword/command.
 
-Implemented multiple line code comments (uses C++ format: /* and */)
+Implemented multiple line code comments (uses C++ format: /* and */).
+
+Added taskbar icon for IDE.
+
+Fixed '*' not showing up on the titles of modified documents.
 
 
 ***** V1.117 *****
