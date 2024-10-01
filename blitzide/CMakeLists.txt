@@ -27,5 +27,6 @@ add_executable(blitzide WIN32
 )
 
 target_compile_options(blitzide PRIVATE /Gz)
+set_property(TARGET blitzide PROPERTY CXX_STANDARD 17)
 
 copy_exe_to_install(blitzide bin/ide)

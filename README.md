@@ -10,7 +10,7 @@ You will also need to install the following optional MSVC components:
 ``` shell
 "Desktop Development with C++",
 "Windows Universal CRT SDK",
-"C++ MFC for [VERSION] build tools with Spectre Mitigations (x86 & x64)",
+"C++ MFC for [VERSION] build tools (x86 & x64)",
 "ASP.NET and web development prerequisites"
 ```
 
