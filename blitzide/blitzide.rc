@@ -56,7 +56,7 @@ BEGIN
     POPUP "&File"
     BEGIN
         MENUITEM "&New\tCtrl+N",                ID_NEW
-        MENUITEM "&Open...\tCtrl+O",            ID_OPEN
+        MENUITEM "Imp&ort...\tCtrl+O",          ID_OPEN
         MENUITEM SEPARATOR
         MENUITEM "&Close\tCtrl+F4",             ID_CLOSE
         MENUITEM "Close All",                   ID_CLOSEALL
@@ -70,7 +70,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Print...\tCtrl+P",           ID_PRINT
         MENUITEM SEPARATOR
-        MENUITEM "E&xit",                       ID_EXIT
+        MENUITEM "E&xit Blitz3D",               ID_EXIT
     END
     POPUP "&Edit"
     BEGIN
@@ -84,17 +84,17 @@ BEGIN
         MENUITEM "Find &Next\tF3",              ID_FINDNEXT
         MENUITEM "&Replace...\tCtrl+R",         ID_REPLACE
         MENUITEM SEPARATOR
-        MENUITEM "&Show Toolbars?\tShift+ESC",  ID_ESCAPE
+        MENUITEM "&Show Toolbar?\tShift+ESC",   ID_ESCAPE
     END
-    POPUP "&Program"
+    POPUP "&Application"
     BEGIN
-        MENUITEM "&Run program\tF5",            ID_EXECUTE
-        MENUITEM "Run program again\tF6",       ID_REEXECUTE
-        MENUITEM "&Check for errors\tF7",       ID_COMPILE
-        MENUITEM "Create &Executable...",       ID_PUBLISH
+        MENUITEM "&Build and run Application\tF5", ID_EXECUTE
+        MENUITEM "Build and run again\tF6",     ID_REEXECUTE
+        MENUITEM "&Check for compilation errors\tF7", ID_COMPILE
+        MENUITEM "Generate &Executable...",     ID_PUBLISH
         MENUITEM SEPARATOR
-        MENUITEM "&Program Command Line...",    ID_COMMANDLINE
-        MENUITEM "&Debug Enabled?",             ID_DEBUG
+        MENUITEM "&Application Command Line...", ID_COMMANDLINE
+        MENUITEM "Enable &Debug?",              ID_DEBUG
     END
     POPUP "&Help"
     BEGIN
@@ -143,22 +143,22 @@ END
 
 IDD_COMPILING DIALOGEX 0, 0, 189, 63
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
-CAPTION "Compiling"
+CAPTION "Compiling Application -- Please Wait"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LTEXT           "Compiling Blitz Basic Program...",IDC_STATIC,36,13,99,8
+    LTEXT           "Compiling Blitz Basic Application...",IDC_STATIC,40,15,107,8
     CONTROL         "Progress2",IDC_COMPILEPROGRESS,"msctls_progress32",PBS_SMOOTH | WS_BORDER,28,31,134,14
 END
 
-IDD_COMMANDLINE DIALOG 0, 0, 186, 77
+IDD_COMMANDLINE DIALOGEX 0, 0, 186, 77
 STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION
-CAPTION "Program Command Line"
-FONT 8, "MS Sans Serif"
+CAPTION "Blitz3D Application Command Line"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     EDITTEXT        IDC_CMDLINE,7,21,172,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,7,56,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,129,56,50,14
-    LTEXT           "Program command line:",IDC_STATIC,7,7,74,8
+    LTEXT           "Application command line:",IDC_STATIC,7,7,74,8
 END
 
 
@@ -207,6 +207,21 @@ BEGIN
     0
 END
 
+IDD_COMMANDLINE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "ide_icn.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -215,19 +230,19 @@ END
 
 STRINGTABLE
 BEGIN
-    IDR_MAINFRAME           "Blitz Basic"
+    IDR_MAINFRAME           "Blitz3D Basic"
 END
 
 STRINGTABLE
 BEGIN
-    ID_OPEN                 "Open a Blitz program\nOpen"
-    ID_SAVE                 "Save this program\nSave"
+    ID_OPEN                 "Open a Blitz3D Application\nOpen"
+    ID_SAVE                 "Save this application\nSave"
     ID_CUT                  "Cut text\nCut"
     ID_COPY                 "Copy text\nCopy"
     ID_PASTE                "Paste text\nPaste"
     ID_FIND                 "Find text\nFind"
     ID_REPLACE              "Replace text\nReplace"
-    ID_COMPILE              "Check program for errors\nCheck for errors"
+    ID_COMPILE              "Check application for errors\nCheck for errors"
 END
 
 STRINGTABLE
@@ -249,7 +264,7 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_PUBLISH              "Create Executable\nCreate Executable"
+    ID_PUBLISH              "Generate Binary Executable\nGenerate Binary Executable"
     ID_CLOSE                "Close file\nClose"
     ID_HOME                 "Help home page\nHome"
     ID_BACK                 "Help backward\nBack"
@@ -258,12 +273,12 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_WINDOWED             "Run program in a window\nRun windowed"
+    ID_WINDOWED             "Run application in a window\nRun windowed"
 END
 
 STRINGTABLE
 BEGIN
-    ID_EXECUTE              "Run program\nRun"
+    ID_EXECUTE              "Run application\nRun"
     ID_STEPOVER             "Step over statement\nStep Over"
     ID_STEPINTO             "Step into function\nStep Into"
     ID_STEPOUT              "Step out of function\nStep Out"
@@ -271,12 +286,12 @@ END
 
 STRINGTABLE
 BEGIN
-    AFX_IDS_APP_TITLE       "Blitz Basic"
+    AFX_IDS_APP_TITLE       "Blitz3D Basic"
 END
 
 STRINGTABLE
 BEGIN
-    IDR_DEBUGFRAME          "Blitz Basic Debugger"
+    IDR_DEBUGFRAME          "Blitz3D Basic Debugger"
 END
 
 #endif    // English (United States) resources
@@ -295,10 +310,10 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_NZ
 // Dialog
 //
 
-IDD_ABOUT DIALOG 0, 0, 224, 237
+IDD_ABOUT DIALOGEX 0, 0, 224, 237
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
-CAPTION "About Blitz"
-FONT 10, "MS Sans Serif"
+CAPTION "Blitz3D SoLoud: MAV-Less -- About"
+FONT 10, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "Okee Dokee!",IDOK,87,216,50,14
     CONTROL         IDB_BITMAP2,IDC_STATIC,"Static",SS_BITMAP | SS_REALSIZEIMAGE,11,5,64,32
@@ -333,6 +348,17 @@ END
 //
 
 IDB_BITMAP2             BITMAP                  "b3dlogo.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_ABOUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 #endif    // English (New Zealand) resources
 /////////////////////////////////////////////////////////////////////////////

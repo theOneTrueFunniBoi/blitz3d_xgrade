@@ -10,6 +10,9 @@
 
 #include <fstream>
 #include <sstream>
+#include <filesystem> 
+
+namespace fs = std::filesystem;
 
 IMPLEMENT_DYNAMIC( MainFrame,CFrameWnd )
 BEGIN_MESSAGE_MAP( MainFrame,CFrameWnd )
@@ -207,7 +210,7 @@ void MainFrame::OnDestroy(){
 }
 
 void MainFrame::setTitle( const string &s ){
-	SetWindowText(("Blitz3D SoLoud: MAV-Less - " + s).c_str());
+	SetWindowText(("Blitz3D SoLoud: MAV-Less -- " + s).c_str());
 }
 
 void MainFrame::OnClose(){
@@ -287,6 +290,8 @@ void MainFrame::cursorMoved( Editor *editor ){
 	char mod=editor->getModified() ? '*' : ' ';
 	char str[64];sprintf( str,"Row:%i Col:%i %c",row,col,mod );
 	statusBar.SetPaneText( 1,str );
+	setTitle( editor->getName()+mod );
+	tabber.setTabText( tabber.getCurrent(),fs::path(editor->getName()).filename().string()+mod );
 }
 
 void MainFrame::currentSet( Tabber *tabber,int index ){

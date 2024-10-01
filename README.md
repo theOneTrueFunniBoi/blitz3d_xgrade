@@ -43,7 +43,7 @@ cmake --build cmake-build-release --config Release
 
 Assuming all went well, the "BLITZ3D_INSTALL" directory will contain the final binaries, simply run "SoLoud-MAVLess.exe" to get blitzing!
 
-### To disable Ogg Vorbis
+### To disable FMod
 Open "CMakeLists.txt"
 and change
 ``` shell
