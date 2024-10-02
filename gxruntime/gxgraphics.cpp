@@ -4,6 +4,8 @@
 #include "gxruntime.h"
 #include <Windows.h>
 #include <afx.h>
+#include <bbruntime/bbsys.h>
+#include "compiler/ex.h"
 
 extern gxRuntime *gx_runtime;
 
@@ -228,6 +230,170 @@ int gxGraphics::getDepth()const{
 	return front_canvas->getDepth();
 }
 
+// god forgive me, gonna MANUALLY parse a ttf
+
+// -------------------------------------------------------------------------------------
+// based on https://www.codeproject.com/Articles/2293/Retrieving-Font-Name-from-TTF-File
+// -------------------------------------------------------------------------------------
+
+//This is TTF file header
+typedef struct _tagTT_OFFSET_TABLE {
+	USHORT uMajorVersion;
+	USHORT uMinorVersion;
+	USHORT uNumOfTables;
+	USHORT uSearchRange;
+	USHORT uEntrySelector;
+	USHORT uRangeShift;
+}TT_OFFSET_TABLE;
+
+//Tables in TTF file and there placement and name (tag)
+typedef struct _tagTT_TABLE_DIRECTORY {
+	char szTag[4]; //table name
+	ULONG uCheckSum; //Check sum
+	ULONG uOffset; //Offset from beginning of file
+	ULONG uLength; //length of the table in bytes
+}TT_TABLE_DIRECTORY;
+
+//Header of names table
+typedef struct _tagTT_NAME_TABLE_HEADER {
+	USHORT uFSelector; //format selector. Always 0
+	USHORT uNRCount; //Name Records count
+	USHORT uStorageOffset; //Offset for strings storage, 
+	//from start of the table
+}TT_NAME_TABLE_HEADER;
+
+//Record in names table
+typedef struct _tagTT_NAME_RECORD {
+	USHORT uPlatformID;
+	USHORT uEncodingID;
+	USHORT uLanguageID;
+	USHORT uNameID;
+	USHORT uStringLength;
+	USHORT uStringOffset; //from start of storage area
+}TT_NAME_RECORD;
+
+#define SWAPWORD(x) MAKEWORD(HIBYTE(x), LOBYTE(x))
+#define SWAPLONG(x) MAKELONG(SWAPWORD(HIWORD(x)), SWAPWORD(LOWORD(x)))
+
+string gxGraphics::getTTFInternalName(string lpszFilePath)
+{
+	CFile f;
+	CString csRetVal;
+
+	// error returns
+	char* retTM = "FAILURE - CORRUPT TTF: ";
+	char* retTM2 = "FAILURE - INVALID TTF: ";
+	char* retTM3 = "FAILURE - CORRUPT TTF: ";
+	char* retTM4 = "FAILURE - UNABLE TO READ TTF: ";
+
+	try
+	{
+
+		//lpszFilePath is the path to our font file
+		if (f.Open(lpszFilePath.c_str(), CFile::modeRead | CFile::shareDenyWrite)) {
+
+			//define and read file header
+			TT_OFFSET_TABLE ttOffsetTable;
+			f.Read(&ttOffsetTable, sizeof(TT_OFFSET_TABLE));
+
+			//remember to rearrange bytes in the field you gonna use
+			ttOffsetTable.uNumOfTables = SWAPWORD(ttOffsetTable.uNumOfTables);
+			ttOffsetTable.uMajorVersion = SWAPWORD(ttOffsetTable.uMajorVersion);
+			ttOffsetTable.uMinorVersion = SWAPWORD(ttOffsetTable.uMinorVersion);
+
+			//check is this is a true type font and the version is 1.0
+			if (ttOffsetTable.uMajorVersion != 1)
+				return retTM + (CString)lpszFilePath.c_str() + " | DID YOU CHANGE THE FILE EXTENSION?";
+
+			//ensure the version is 1.0
+			if (ttOffsetTable.uMinorVersion != 0)
+				return retTM2 + (CString)lpszFilePath.c_str() + " | FILE VERSION IS 1." + (char)ttOffsetTable.uMinorVersion + ", EXPECTED: 1.0";
+
+			TT_TABLE_DIRECTORY tblDir;
+			BOOL bFound = FALSE;
+			CString csTemp;
+
+			for (int i = 0; i < ttOffsetTable.uNumOfTables; i++) {
+				f.Read(&tblDir, sizeof(TT_TABLE_DIRECTORY));
+				csTemp.Empty();
+
+				//table's tag cannot exceed 4 characters
+				strncpy(csTemp.GetBuffer(4), tblDir.szTag, 4);
+				csTemp.ReleaseBuffer();
+				if (csTemp.CompareNoCase(_T("name")) == 0) {
+					//we found our table. Rearrange order and quit the loop
+					bFound = TRUE;
+					tblDir.uLength = SWAPLONG(tblDir.uLength);
+					tblDir.uOffset = SWAPLONG(tblDir.uOffset);
+					break;
+				}
+			}
+
+			if (bFound) {
+				//move to offset we got from Offsets Table
+				f.Seek(tblDir.uOffset, CFile::begin);
+				TT_NAME_TABLE_HEADER ttNTHeader;
+				f.Read(&ttNTHeader, sizeof(TT_NAME_TABLE_HEADER));
+
+				//again, don't forget to swap bytes!
+				ttNTHeader.uNRCount = SWAPWORD(ttNTHeader.uNRCount);
+				ttNTHeader.uStorageOffset = SWAPWORD(ttNTHeader.uStorageOffset);
+				TT_NAME_RECORD ttRecord;
+				bFound = FALSE;
+
+				for (int i = 0; i < ttNTHeader.uNRCount; i++) {
+					f.Read(&ttRecord, sizeof(TT_NAME_RECORD));
+					ttRecord.uNameID = SWAPWORD(ttRecord.uNameID);
+
+					//1 says that this is font name. 0 for example determines copyright info
+					if (ttRecord.uNameID == 1) {
+						ttRecord.uStringLength = SWAPWORD(ttRecord.uStringLength);
+						ttRecord.uStringOffset = SWAPWORD(ttRecord.uStringOffset);
+
+						//save file position, so we can return to continue with search
+						int nPos = f.GetPosition();
+						f.Seek(tblDir.uOffset + ttRecord.uStringOffset +
+							ttNTHeader.uStorageOffset, CFile::begin);
+
+						//bug fix: see the post by SimonSays to read more about it
+						//std::string* lpszNameBuf = (std::string*)malloc(ttRecord.uStringLength+1);
+						//ZeroMemory(&lpszNameBuf, ttRecord.uStringLength+1);
+						//f.Read(&lpszNameBuf, ttRecord.uStringLength);
+						f.Read(csTemp.GetBuffer(ttRecord.uStringLength), ttRecord.uStringLength);
+
+						csTemp.ReleaseBuffer();
+
+						//CString retTmp = CString(lpszNameBuf);
+						//return lpszNameBuf;
+
+						//yes, still need to check if the font name is not empty
+						//if it is, continue the search
+						if (!(csTemp.IsEmpty())) {
+							csRetVal = csTemp;
+							//return csTemp;
+							break;
+						}
+						//csTemp.ReleaseBuffer();
+						f.Seek(nPos, CFile::begin);
+					}
+				}
+				f.Close();
+
+				return csRetVal;
+			}
+			f.Close();
+
+			return retTM3 + (CString)lpszFilePath.c_str() + " | NAME FIELD DOES NOT EXIST";
+		}
+
+		return retTM4 + (CString)lpszFilePath.c_str() + " | CONTACT FUNNIMAN.EXE";
+	}
+	catch (Ex exc)
+	{
+		RTEX(exc.ex.c_str());
+	}
+}
+
 gxFont *gxGraphics::loadFont( const string &f,int height,int flags ){
 
 	int bold=flags & gxFont::FONT_BOLD ? FW_BOLD : FW_REGULAR;
@@ -239,39 +405,32 @@ gxFont *gxGraphics::loadFont( const string &f,int height,int flags ){
 	int n=f.find('.');
 	if( n!=string::npos ){
 		t=fullfilename(f);
-		//gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
+		gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
 		if( !font_res.count(t) && AddFontResource( t.c_str() ) ) font_res.insert( t );
-		// ok now time to spend way to long getting one single fucking string
-		/*unsigned long size = GetFileVersionInfoSize(t.c_str(), &size);
-		char* buff = (char*)malloc(size);
-		GetFileVersionInfo(t.c_str(), NULL, size, buff);
-		void* fixedInfo;
-		fixedInfo = new char[size];
-		unsigned int retSize = 0;
-		VerQueryValue(buff, "\\VarFileInfo\\Translation", &fixedInfo, &retSize);
 
-		struct LANGANDCODEPAGE {
-			WORD wLanguage;
-			WORD wCodePage;
-		} *translationArray;
-
-		for (unsigned int i = 0; i < (retSize / sizeof(LANGANDCODEPAGE)); i++)
+		// getTTFInternalName can only get a true type font's internal name, if not ttf: use old font loader
+		if (t.find(".ttf") != std::string::npos)
 		{
-			wchar_t fileDescKey[256];
-			wsprintf((LPSTR)fileDescKey, "\\StringFileInfo\\%04x%04x\\FileDescription", translationArray[i].wLanguage, translationArray[i].wCodePage);
-			wchar_t* fileDesc = NULL;
-			UINT fileDescSize;
-			if (VerQueryValue(buff, (LPSTR)fileDescKey, (LPVOID*)&fileDesc, &fileDescSize))
+			// new font loader
+			string rInput;
+
+			rInput = getTTFInternalName(t);
+
+			//if (tmp.Find("FAILURE -") != -1)
+			if (rInput.find("FAILURE -") != std::string::npos)
 			{
-
+				RTEX(rInput.c_str());
+				return 0;
 			}
-		}*/
 
-		//gx_runtime->debugLog(TEXT("\\StringFileInfo\\%04x%04x\\FileDescription"));
-
-		//gx_runtime->debugLog((const char*)fixedInfo); // temp, to determine out how fucked loadfont is
-		t = filenamefile(f.substr(0, n)); // causes font loading bug
-		//gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
+			gx_runtime->debugLog(rInput.c_str()); // temp, to determine out how fucked loadfont is
+			t = rInput;
+			gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
+		} else {
+			// old font loader
+			t = filenamefile(f.substr(0, n)); // causes font loading bug
+			gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
+		}
 	}else{
 		t=f;
 	}

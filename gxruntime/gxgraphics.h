@@ -5,6 +5,7 @@
 #include <set>
 #include <string>
 #include <d3d.h>
+#include "std.h"
 
 #include "ddutil.h"
 
@@ -100,6 +101,10 @@ public:
 	gxMovie *verifyMovie( gxMovie *movie );
 	void closeMovie( gxMovie *movie );
 
+	// getTTFInternalName( string PathToTrueTypeFont )
+	// On Success - Returns String ttfInternalName
+	// On Fail - Returns "FAILURE -" followed by error
+	std::string getTTFInternalName(std::string lpszFilePath);
 	gxFont *loadFont( const std::string &font,int height,int flags );
 	gxFont *verifyFont( gxFont *font );
 	void freeFont( gxFont *font );
