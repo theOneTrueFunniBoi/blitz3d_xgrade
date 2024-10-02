@@ -2,6 +2,8 @@
 #include "std.h"
 #include "gxgraphics.h"
 #include "gxruntime.h"
+#include <Windows.h>
+#include <afx.h>
 
 extern gxRuntime *gx_runtime;
 
@@ -237,8 +239,39 @@ gxFont *gxGraphics::loadFont( const string &f,int height,int flags ){
 	int n=f.find('.');
 	if( n!=string::npos ){
 		t=fullfilename(f);
+		//gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
 		if( !font_res.count(t) && AddFontResource( t.c_str() ) ) font_res.insert( t );
-		t=filenamefile( f.substr(0,n) );
+		// ok now time to spend way to long getting one single fucking string
+		/*unsigned long size = GetFileVersionInfoSize(t.c_str(), &size);
+		char* buff = (char*)malloc(size);
+		GetFileVersionInfo(t.c_str(), NULL, size, buff);
+		void* fixedInfo;
+		fixedInfo = new char[size];
+		unsigned int retSize = 0;
+		VerQueryValue(buff, "\\VarFileInfo\\Translation", &fixedInfo, &retSize);
+
+		struct LANGANDCODEPAGE {
+			WORD wLanguage;
+			WORD wCodePage;
+		} *translationArray;
+
+		for (unsigned int i = 0; i < (retSize / sizeof(LANGANDCODEPAGE)); i++)
+		{
+			wchar_t fileDescKey[256];
+			wsprintf((LPSTR)fileDescKey, "\\StringFileInfo\\%04x%04x\\FileDescription", translationArray[i].wLanguage, translationArray[i].wCodePage);
+			wchar_t* fileDesc = NULL;
+			UINT fileDescSize;
+			if (VerQueryValue(buff, (LPSTR)fileDescKey, (LPVOID*)&fileDesc, &fileDescSize))
+			{
+
+			}
+		}*/
+
+		//gx_runtime->debugLog(TEXT("\\StringFileInfo\\%04x%04x\\FileDescription"));
+
+		//gx_runtime->debugLog((const char*)fixedInfo); // temp, to determine out how fucked loadfont is
+		t = filenamefile(f.substr(0, n)); // causes font loading bug
+		//gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
 	}else{
 		t=f;
 	}
