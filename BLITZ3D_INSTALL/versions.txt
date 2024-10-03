@@ -10,6 +10,7 @@ Added taskbar icon for IDE.
 
 Fixed '*' not showing up on the titles of modified documents.
 
+Fixed LoadFont() requiring the font's filename to match the font's internal name.
 
 ***** V1.117 *****
 

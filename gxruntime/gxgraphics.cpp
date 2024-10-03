@@ -272,6 +272,26 @@ typedef struct _tagTT_NAME_RECORD {
 	USHORT uStringOffset; //from start of storage area
 }TT_NAME_RECORD;
 
+typedef struct _tagTT_HEAD_RECORD {
+	float     fVersion;
+	float     fFontRevision;
+	uint32_t  uCheckSumAdjustment;
+	uint32_t  uMagicNumber; //always 0x5F0F3CF5
+	uint16_t  uFlags;
+	uint16_t  uUnitsPerEm;
+	long long lCreated;
+	long long lNodified;
+	short     sXMin;
+	short     sYMin;
+	short     sXMax;
+	short     sYMax;
+	uint16_t  macStyle;
+	uint16_t  lowestRecPPEM;
+	short     fontDirectionHintl;
+	short     indexToLocFormat;
+	short     glyphDataFormat; //from start of storage area
+}TT_HEAD_RECORD;
+
 #define SWAPWORD(x) MAKEWORD(HIBYTE(x), LOBYTE(x))
 #define SWAPLONG(x) MAKELONG(SWAPWORD(HIWORD(x)), SWAPWORD(LOWORD(x)))
 
@@ -288,7 +308,6 @@ string gxGraphics::getTTFInternalName(string lpszFilePath)
 
 	try
 	{
-
 		//lpszFilePath is the path to our font file
 		if (f.Open(lpszFilePath.c_str(), CFile::modeRead | CFile::shareDenyWrite)) {
 
@@ -310,7 +329,7 @@ string gxGraphics::getTTFInternalName(string lpszFilePath)
 				return retTM2 + (CString)lpszFilePath.c_str() + " | FILE VERSION IS 1." + (char)ttOffsetTable.uMinorVersion + ", EXPECTED: 1.0";
 
 			TT_TABLE_DIRECTORY tblDir;
-			BOOL bFound = FALSE;
+			BOOL bFoundName = FALSE;
 			CString csTemp;
 
 			for (int i = 0; i < ttOffsetTable.uNumOfTables; i++) {
@@ -322,14 +341,14 @@ string gxGraphics::getTTFInternalName(string lpszFilePath)
 				csTemp.ReleaseBuffer();
 				if (csTemp.CompareNoCase(_T("name")) == 0) {
 					//we found our table. Rearrange order and quit the loop
-					bFound = TRUE;
+					bFoundName = TRUE;
 					tblDir.uLength = SWAPLONG(tblDir.uLength);
 					tblDir.uOffset = SWAPLONG(tblDir.uOffset);
 					break;
 				}
 			}
 
-			if (bFound) {
+			if (bFoundName) {
 				//move to offset we got from Offsets Table
 				f.Seek(tblDir.uOffset, CFile::begin);
 				TT_NAME_TABLE_HEADER ttNTHeader;
@@ -339,7 +358,7 @@ string gxGraphics::getTTFInternalName(string lpszFilePath)
 				ttNTHeader.uNRCount = SWAPWORD(ttNTHeader.uNRCount);
 				ttNTHeader.uStorageOffset = SWAPWORD(ttNTHeader.uStorageOffset);
 				TT_NAME_RECORD ttRecord;
-				bFound = FALSE;
+				bFoundName = FALSE;
 
 				for (int i = 0; i < ttNTHeader.uNRCount; i++) {
 					f.Read(&ttRecord, sizeof(TT_NAME_RECORD));
@@ -359,7 +378,11 @@ string gxGraphics::getTTFInternalName(string lpszFilePath)
 						//std::string* lpszNameBuf = (std::string*)malloc(ttRecord.uStringLength+1);
 						//ZeroMemory(&lpszNameBuf, ttRecord.uStringLength+1);
 						//f.Read(&lpszNameBuf, ttRecord.uStringLength);
-						f.Read(csTemp.GetBuffer(ttRecord.uStringLength), ttRecord.uStringLength);
+
+						csTemp.Empty();
+						csTemp.FreeExtra();
+
+						f.Read(csTemp.GetBuffer(ttRecord.uStringLength), ttRecord.uStringLength+1);
 
 						csTemp.ReleaseBuffer();
 
@@ -377,13 +400,57 @@ string gxGraphics::getTTFInternalName(string lpszFilePath)
 						f.Seek(nPos, CFile::begin);
 					}
 				}
-				f.Close();
 
+				/*BOOL bFoundHead = FALSE;
+				
+				for (int j = 0; j < ttOffsetTable.uNumOfTables; j++) {
+					f.Read(&tblDir, sizeof(TT_TABLE_DIRECTORY));
+					csTemp.Empty();
+
+					//table's tag cannot exceed 4 characters
+					strncpy(csTemp.GetBuffer(4), tblDir.szTag, 4);
+					csTemp.ReleaseBuffer();
+					if (csTemp.CompareNoCase(_T("head")) == 0) {
+						//we found our table. Rearrange order and quit the loop
+						bFoundHead = TRUE;
+						//tblDir.uLength = SWAPLONG(tblDir.uLength);
+						//tblDir.uOffset = SWAPLONG(tblDir.uOffset);
+						break;
+					}
+				}
+
+				if (bFoundHead) {
+					//move to offset we got from Offsets Table
+					f.Seek(tblDir.uOffset, CFile::begin);
+					
+					TT_HEAD_RECORD ttHRecord;
+					bFoundHead = FALSE;
+
+					f.Read(&ttHRecord, sizeof(TT_HEAD_RECORD));
+					ttHRecord.macStyle = SWAPWORD(ttHRecord.macStyle);
+
+					int tmp = ttHRecord.macStyle & 0x0001 == 0x0001;
+					gx_runtime->debugLog((const char*)tmp);
+
+					if (tmp) {
+						csRetVal += " Bold";
+					}
+				}
+				else
+				{
+					f.Close();
+					//return retTM3 + (CString)lpszFilePath.c_str() + " | HEAD FIELD DOES NOT EXIST";
+					gx_runtime->debugLog("LOADFONT - WARNING: " + (CString)lpszFilePath.c_str() + " DOES NOT CONTAIN FIELD: HEAD");
+				}*/
+			}
+			else
+			{
+				f.Close();
+				return retTM3 + (CString)lpszFilePath.c_str() + " | NAME FIELD DOES NOT EXIST";
 				return csRetVal;
 			}
 			f.Close();
-
-			return retTM3 + (CString)lpszFilePath.c_str() + " | NAME FIELD DOES NOT EXIST";
+			return csRetVal;
 		}
 
 		return retTM4 + (CString)lpszFilePath.c_str() + " | CONTACT FUNNIMAN.EXE";
@@ -405,7 +472,7 @@ gxFont *gxGraphics::loadFont( const string &f,int height,int flags ){
 	int n=f.find('.');
 	if( n!=string::npos ){
 		t=fullfilename(f);
-		gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
+		//gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
 		if( !font_res.count(t) && AddFontResource( t.c_str() ) ) font_res.insert( t );
 
 		// getTTFInternalName can only get a true type font's internal name, if not ttf: use old font loader
@@ -423,13 +490,13 @@ gxFont *gxGraphics::loadFont( const string &f,int height,int flags ){
 				return 0;
 			}
 
-			gx_runtime->debugLog(rInput.c_str()); // temp, to determine out how fucked loadfont is
+			//gx_runtime->debugLog(rInput.c_str()); // temp, to determine out how fucked loadfont is
 			t = rInput;
-			gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
+			//gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
 		} else {
 			// old font loader
 			t = filenamefile(f.substr(0, n)); // causes font loading bug
-			gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
+			//gx_runtime->debugLog(t.c_str()); // temp, to determine out how fucked loadfont is
 		}
 	}else{
 		t=f;
