@@ -447,7 +447,6 @@ string gxGraphics::getTTFInternalName(string lpszFilePath)
 			{
 				f.Close();
 				return retTM3 + (CString)lpszFilePath.c_str() + " | NAME FIELD DOES NOT EXIST";
-				return csRetVal;
 			}
 			f.Close();
 			return csRetVal;
