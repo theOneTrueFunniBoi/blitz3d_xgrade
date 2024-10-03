@@ -485,7 +485,11 @@ gxFont *gxGraphics::loadFont( const string &f,int height,int flags ){
 			//if (tmp.Find("FAILURE -") != -1)
 			if (rInput.find("FAILURE -") != std::string::npos)
 			{
-				RTEX(rInput.c_str());
+				if (debug) {
+					RTEX(rInput.c_str());
+				} else {
+					errorLog.push_back("LoadFont: "+rInput);
+				}
 				return 0;
 			}
 
