@@ -4,6 +4,8 @@ Added MAV-Less Error Checking (might replace with stacktrace).
 
 Added new BlitzVersion keyword/command.
 
+Fixed the Enter key not creating new lines.
+
 Implemented multiple line code comments (uses C++ format: /* and */).
 
 Added taskbar icon for IDE.

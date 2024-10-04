@@ -663,7 +663,8 @@ void Editor::en_msgfilter( NMHDR *nmhdr,LRESULT *result ){
 			int pos=selStart-editCtrl.LineIndex( ln );
 			string line=getLine( ln );if( pos>line.size() ) return;
 			for( k=0;k<pos && line[k]=='\t';++k ){}
-			line=line.substr( 0,k )+'\0';
+			//line=line.substr( 0,k )+'\0';
+			line=line.substr( 0,k )+'\n'; //used to be \0, if something breaks try changing back to \0
 			editCtrl.ReplaceSel( line.data(),true );
 			*result=1;
 		}
