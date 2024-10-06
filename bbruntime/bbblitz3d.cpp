@@ -758,6 +758,7 @@ Brush *  bbCreateBrush( float r,float g,float b ){
 	Brush *br=d_new Brush();
 	br->setColor( Vector( r*ctof,g*ctof,b*ctof ) );
 	brush_set.insert( br );
+	if (!debugBrush(br, "CreateBrush")) return 0;
 	return br;
 }
 
@@ -769,6 +770,7 @@ Brush *  bbLoadBrush( BBStr *file,int flags,float u_scale,float v_scale ){
 	Brush *br=bbCreateBrush( 255,255,255 );
 	br->setTexture( 0,t,0 );
 	delete file;
+	if (!debugBrush(br, "LoadBrush")) return 0;
 	return br;
 }
 
@@ -822,7 +824,9 @@ void  bbBrushFX( Brush *b,int fx ){
 Entity *  bbCreateMesh( Entity *p ){
 	if (!debugParent(p,"CreateMesh")) return 0;
 	MeshModel *m=d_new MeshModel();
-	return insertEntity( m,p );
+	Entity* i = insertEntity(m, p);
+	if (!debugMesh(m, "CreateMesh")) return 0;
+	return i;
 }
 
 Entity *  bbLoadMesh( BBStr *f,Entity *p ){
@@ -830,10 +834,13 @@ Entity *  bbLoadMesh( BBStr *f,Entity *p ){
 	Entity *e=loadEntity( f->c_str(),MeshLoader::HINT_COLLAPSE );
 	delete f;
 
-	if( !e ) return 0;
+	//if( !e ) return 0;
+	//if (!debugEntity(e, "LoadMesh")) return 0;
 	MeshModel *m=d_new MeshModel();
 	collapseMesh( m,e );
-	return insertEntity( m,p );
+	Entity* i = insertEntity(m, p);
+	if (!debugMesh(m, "LoadMesh")) return 0;
+	return i;
 }
 
 Entity *  bbLoadAnimMesh( BBStr *f,Entity *p ){
@@ -841,17 +848,21 @@ Entity *  bbLoadAnimMesh( BBStr *f,Entity *p ){
 	Entity *e=loadEntity( f->c_str(),0 );
 	delete f;
 
-	if( !e ) return 0;
+	// if (!e) return 0;
 	if( Animator *anim=e->getObject()->getAnimator() ){
 		anim->animate( 1,0,0,0 );
 	}
-	return insertEntity( e,p );
+	Entity* i = insertEntity(e, p);
+	if (!debugEntity(e, "LoadAnimMesh")) return 0;
+	return i;
 }
 
 Entity *  bbCreateCube( Entity *p ){
 	if (!debugParent(p,"CreateCube")) return 0;
 	Entity *e=MeshUtil::createCube( Brush() );
-	return insertEntity( e,p );
+	Entity* i = insertEntity(e, p);
+	if (!debugEntity(e, "CreateCube")) return 0;
+	return i;
 }
 
 Entity *  bbCreateSphere( int segs,Entity *p ){
@@ -865,7 +876,9 @@ Entity *  bbCreateSphere( int segs,Entity *p ){
 		}
 	}
 	Entity *e=MeshUtil::createSphere( Brush(),segs );
-	return insertEntity( e,p );
+	Entity* i = insertEntity(e, p);
+	if (!debugEntity(e, "CreateSphere")) return 0;
+	return i;
 }
 
 Entity *  bbCreateCylinder( int segs,int solid,Entity *p ){
@@ -879,7 +892,9 @@ Entity *  bbCreateCylinder( int segs,int solid,Entity *p ){
 		}
 	}
 	Entity *e=MeshUtil::createCylinder( Brush(),segs,!!solid );
-	return insertEntity( e,p );
+	Entity* i = insertEntity(e, p);
+	if (!debugEntity(e, "CreateCylinder")) return 0;
+	return i;
 }
 
 Entity *  bbCreateCone( int segs,int solid,Entity *p ){
@@ -893,7 +908,9 @@ Entity *  bbCreateCone( int segs,int solid,Entity *p ){
 		}
 	}
 	Entity *e=MeshUtil::createCone( Brush(),segs,!!solid );
-	return insertEntity( e,p );
+	Entity* i = insertEntity(e, p);
+	if (!debugEntity(e, "CreateCone")) return 0;
+	return i;
 }
 
 Entity *  bbCopyMesh( MeshModel *m,Entity *p ){

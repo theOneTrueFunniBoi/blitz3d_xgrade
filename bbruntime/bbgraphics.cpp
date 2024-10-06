@@ -94,12 +94,14 @@ static inline bool debugCanvas( gxCanvas *c,const char* a ){
 static inline bool debugDriver( int n,const char* a ){
 	if( debug ){
 		if( n<1 || n>gx_runtime->numGraphicsDrivers() ){
-			RTEX( "Illegal graphics driver index" );
+			//RTEX( "Illegal graphics driver index" );
+			printf("illegal gfx driver index");
 			return false;
 		}
 	} else {
 		if( n<1 || n>gx_runtime->numGraphicsDrivers() ){
-			errorLog.push_back(std::string(a)+std::string(": Illegal graphics driver index"));
+			//errorLog.push_back(std::string(a)+std::string(": Illegal graphics driver index"));
+			printf("illegal gfx driver index (debug disabled)");
 			return false;
 		}
 	}
@@ -647,6 +649,7 @@ gxFont *bbLoadFont( BBStr *name,int height,int bold,int italic,int underline ){
 		(underline ? gxFont::FONT_UNDERLINE : 0 );
 	gxFont *font=gx_graphics->loadFont( *name,height,flags );
 	delete name;
+	if (!debugFont(font, "LoadFont")) return 0;
 	return font;
 }
 
@@ -713,6 +716,7 @@ bbImage *bbLoadImage( BBStr *s ){
 	frames.push_back( c );
 	bbImage *i=d_new bbImage( frames );
 	image_set.insert( i );
+	if (!debugImage(i, 0, "LoadImage")) return 0;
 	return i;
 }
 
@@ -753,6 +757,7 @@ bbImage *bbLoadAnimImage( BBStr *s,int w,int h,int first,int cnt ){
 	gx_graphics->freeCanvas( pic );
 	bbImage *i=d_new bbImage( frames );
 	image_set.insert( i );
+	if (!debugImage(i, 0, "LoadAnimImage")) return 0;
 	return i;
 }
 
@@ -796,10 +801,12 @@ bbImage *bbCreateImage( int w,int h,int n ){
 	}
 	bbImage *i=d_new bbImage( frames );
 	image_set.insert( i );
+	if (!debugImage(i, 0, "CreateImage")) return 0;
 	return i;
 }
 
 void bbFreeImage( bbImage *i ){
+	if (!debugImage(i, 0, "FreeImage")) return;
 	if( !image_set.erase(i) ) return;
 	const vector<gxCanvas*> &f=i->getFrames();
 	for( int k=0;k<f.size();++k ){
