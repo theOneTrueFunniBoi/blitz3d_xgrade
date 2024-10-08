@@ -31,6 +31,56 @@ void bbRuntimeError(BBStr* str)
     RTEX(err);
 }
 
+void bbRuntimeErrorPrevTrace(BBStr* str)
+{
+    string t = *str;
+    delete str;
+    if (t.size() > 255) t[255] = 0;
+    static char err[256];
+    strcpy(err, t.c_str());
+    string tmp = "";
+    for (int i = 0; i < blockTraces.size(); i++) {
+        tmp = blockTraces[i].file + ", line " + to_string(blockTraces[i].lineTrace) + "\n" + tmp;
+    }
+    BBStr tmp2 = (BBStr)tmp;
+    bbEx::overrideLineTrace = &tmp2;
+    tmp = "";
+    tmp2 = "";
+
+    void* array[10];
+    unsigned short frames;
+    SYMBOL_INFO* symbol;
+    HANDLE process = GetCurrentProcess();
+
+    SymInitialize(process, NULL, TRUE);
+    frames = CaptureStackBackTrace(0, 10, array, NULL);
+    symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
+    symbol->MaxNameLen = 255;
+    symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+    for (unsigned short i = 0; i < frames; i++)
+    {
+        SymFromAddr(process, (DWORD64)(array[i]), 0, symbol);
+        tmp += "  " + (string)symbol->Name + " - 0x" + to_string(symbol->Address);
+    }
+    tmp2 = (BBStr)tmp;
+    bbEx::overrideAddressTrace = &tmp2;
+    free(symbol);
+    bbEx::overrideTrace = true;
+    RTEX(err);
+}
+
+void bbRuntimeErrorNoTrace(BBStr* str)
+{
+    string t = *str;
+    delete str;
+    if (t.size() > 255) t[255] = 0;
+    static char err[256];
+    strcpy(err, t.c_str());
+    bbEx::overrideTrace = true;
+    RTEX(err);
+}
+
 int bbExecFile(BBStr* f)
 {
     string t = *f;
@@ -146,7 +196,7 @@ BBStr* bbGetLineTrace() {
 
 BBStr* bbGetAddressTrace()
 {
-    string retVal = "\n\nStack addresses: \n -";
+    string retVal = "";
     string tmp = "";
 
     void* array[10];
@@ -284,6 +334,8 @@ void bbruntime_link(void (*rtSym)(const char* sym, void* pc))
     rtSym("Stop", bbStop);
     rtSym("AppTitle$title$close_prompt=\"\"", bbAppTitle);
     rtSym("RuntimeError$message", bbRuntimeError);
+    rtSym("RuntimeErrorPrevTrace$message", bbRuntimeErrorPrevTrace);
+    rtSym("RuntimeErrorNoTrace$message", bbRuntimeErrorNoTrace);
     rtSym("ExecFile$command", bbExecFile);
     rtSym("Delay%millisecs", bbDelay);
     rtSym("%MilliSecs", bbMilliSecs);
