@@ -1,15 +1,16 @@
 
 #include <string>
 #include <windows.h>
+#include "../config/versionconfig.h"
 
 using namespace std;
 
 static const char *bb_err=
-"Unable to run SoLoud MAV-Less";
+("Unable to run "+VersionConfig::blitzIdent+".").c_str();
 
 static const char *md_err=
-"Your desktop must be in high-colour mode to use SoLoud MAV-Less.\n\n"
-"You can change your display settings from the control panel."; 
+("Your desktop must be in high-colour mode to use "+VersionConfig::blitzIdent+".\n\n"
+"You can change your display settings from the control panel.").c_str(); 
 
 static string getAppDir(){
     char buff[MAX_PATH];
@@ -23,7 +24,7 @@ static string getAppDir(){
 }
 
 static void fail( const char *p ){
-    ::MessageBox( 0,p,"Blitz3D SoLoud MAV-Less Error",MB_SETFOREGROUND|MB_TOPMOST|MB_ICONERROR );
+    ::MessageBox( 0,p, (VersionConfig::blitzIdent+" Error").c_str(), MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR );
     ExitProcess(-1);
 }
 
@@ -46,7 +47,7 @@ int _stdcall WinMain( HINSTANCE inst,HINSTANCE prev,char *cmd,int show ){
     PROCESS_INFORMATION pi;
     ZeroMemory(&si,sizeof(si));si.cb=sizeof(si);
 	if( !CreateProcess( 0,(char*)t.c_str(),0,0,0,0,0,0,&si,&pi ) ){
-		::MessageBox( 0,bb_err,"Blitz Basic Error",MB_SETFOREGROUND|MB_TOPMOST|MB_ICONERROR );
+		::MessageBox( 0,bb_err,"Blitz Basic Error",MB_SYSTEMMODAL|MB_SETFOREGROUND|MB_TOPMOST|MB_ICONERROR );
 		ExitProcess(-1);
 	}
 

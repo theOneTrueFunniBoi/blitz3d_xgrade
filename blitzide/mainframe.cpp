@@ -210,7 +210,7 @@ void MainFrame::OnDestroy(){
 }
 
 void MainFrame::setTitle( const string &s ){
-	SetWindowText(("Blitz3D SoLoud: MAV-Less -- " + s).c_str());
+	SetWindowText((VersionConfig::blitzIdent+" -- "+s).c_str());
 }
 
 void MainFrame::OnClose(){

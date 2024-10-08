@@ -6,15 +6,13 @@
 
 #include <mmsystem.h>
 
-char _credits[] =
-	"\r\n"
-	"Blitz3D: Mark Sibly\r\n\r\n"
-	"Blitz3D SoLoud Edition: Mark Sibly\r\n\r\n"
-	"Blitz3D SoLoud MAV-Less Edition: funniman.exe (Oscar Hunt)\r\n\r\n"
+char _credits[] = "\r\n";
+char _credits2[] = ": Mark Sibly\r\n\r\n";
+char _credist3[] = " SoLoud Edition: Mark Sibly\r\n\r\n";
+char _credits4[] = ": funniman.exe (Oscar Hunt)\r\n\r\n"
 	"Documentation: Mark Sibly, Simon Harrison, Paul Gerfen, Shane Monroe and the Blitz Doc Team\r\n\r\n"
 	"Testing and support: James Boyd, Simon Armstrong and the Blitz Dev Team\r\n\r\n"
 	"FreeImage Image loader courtesy of Floris van den berg\r\n\r\n";
-
 class Dialog : public CDialog {
 	bool _quit;
 public:
@@ -73,6 +71,12 @@ void aboutBlitz(bool delay) {
 	string run_v=itoa(run_ver/1000)+"."+itoa(run_ver%1000);
 
 	string credits = _credits;
+	credits += VersionConfig::blitzIdentShortest;
+	credits += _credits2;
+	credits += VersionConfig::blitzIdentShortest;
+	credits += _credist3;
+	credits += VersionConfig::blitzIdent;
+	credits += _credits4;
 
 	if(runtime_ver>>16==3) {
 		credits += "LibSGD (c) Mark Sibly";
@@ -87,7 +91,7 @@ void aboutBlitz(bool delay) {
 
 	about.GetDlgItem(IDC_CREDITS)->SetWindowText(credits.c_str());
 
-	string t="Blitz3D MAV-Less IDE v"+ide_v;
+	string t= VersionConfig::blitzIdentShort+" IDE v"+ide_v;
 	about.GetDlgItem( IDC_PRODUCT )->SetWindowText( t.c_str() );
 
 	t="Compiler v"+bcc_v +" Linker v"+lnk_v;

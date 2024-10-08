@@ -22,6 +22,8 @@
 #include "../blitz3d/listener.h"
 #include "../blitz3d/cachedtexture.h"
 
+#include "../config/versionconfig.h"
+
 gxScene *gx_scene;
 extern gxFileSystem *gx_filesys;
 
@@ -2285,6 +2287,21 @@ BBStr *bbBlitzVersion()
 	return new BBStr(to_string(major)+"."+to_string(minor));
 }
 
+BBStr* bbBlitzIdent()
+{
+	return new BBStr(VersionConfig::blitzIdent.c_str());
+}
+
+BBStr* bbBlitzShortIdent()
+{
+	return new BBStr(VersionConfig::blitzIdentShort.c_str());
+}
+
+BBStr* bbBlitzShortestIdent()
+{
+	return new BBStr(VersionConfig::blitzIdentShortest.c_str());
+}
+
 void  bbClearWorld( int e,int b,int t ){
 	if( e ){
 		while( Entity::orphans() ) bbFreeEntity( Entity::orphans() );
@@ -2609,4 +2626,7 @@ void blitz3d_link( void (*rtSym)( const char *sym,void *pc ) ){
 	rtSym( "$EntityClass%entity",bbEntityClass );
 
 	rtSym( "$BlitzVersion",bbBlitzVersion );
+	rtSym( "$BlitzIdent",bbBlitzIdent );
+	rtSym( "$BlitzShortIdent",bbBlitzShortIdent );
+	rtSym( "$BlitzShortestIdent",bbBlitzShortestIdent );
 }

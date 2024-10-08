@@ -25,8 +25,11 @@ add_executable(blitzide WIN32
 	stdafx.h
 	tabber.h
 )
+set(LIBS config)
 
 target_compile_options(blitzide PRIVATE /Gz)
 set_property(TARGET blitzide PROPERTY CXX_STANDARD 17)
+
+target_link_libraries(blitzide ${LIBS})
 
 copy_exe_to_install(blitzide bin/ide)
