@@ -125,7 +125,8 @@ void Toker::nextline(){
 	if( in.eof() ){
 		//if (isComment) { exception("Multiline Comment missing postfix! Did you forget to add '*/'?"); }
 		if (isComment){ failureType=1; }
-		line.resize(1);line[0]=EOF;
+		line.resize(1);
+		line[0]=EOF;
 		tokes.push_back( Toke( EOF,0,1 ) );
 		return;
 	}

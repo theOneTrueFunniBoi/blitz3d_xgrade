@@ -1,6 +1,6 @@
 ## Blitz3D SoLoud: MAV-Less Edition
 
-This is a fork of BlitzResearch' Blitz3D: SoLoud Edition which implements juanjp600's MAV-Less/FastExt Killer/~~OpenAL~~ Patches
+This is a fork of BlitzResearch' Blitz3D: SoLoud Edition which implements juanjp600's MAV-Less/Stacktrace/FastExt Killer/~~OpenAL~~ Patches
 
 ### Setting up SoLoud MAV-Less Project Files
 

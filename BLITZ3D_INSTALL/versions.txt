@@ -1,12 +1,14 @@
 ***** MAV-Less V1.000 *****
 
-Added MAV-Less Error Checking (might replace with stacktrace).
+Added MAV-Less Error Checking & Stack Trace reporting.
 
-Added new BlitzVersion keyword/command.
+Added new BlitzVersion, ErrorLog, GetLineTrace, and GetAddressTrace keywords/commands.
 
-Fixed the Enter key not creating new lines.
+Fixed the Enter key not creating new lines in the IDE.
 
 Implemented multiple line code comments (uses C++ format: /* and */).
+
+Code comments may now be made using the c++ standard ("//")
 
 Added taskbar icon for IDE.
 

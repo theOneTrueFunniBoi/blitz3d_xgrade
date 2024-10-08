@@ -9,9 +9,19 @@ add_library(bbruntime_dll MODULE
 	bbruntime_dll.rc
 	resource.h)
 
+if(CMAKE_CXX_FLAGS MATCHES "/EHsc")
+    string(REGEX REPLACE "/EHsc" "/EHa" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+else()
+    if(CMAKE_CXX_FLAGS MATCHES "/EHs")
+        string(REGEX REPLACE "/EHs" "/EHa" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    else()
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHa")
+    endif()
+endif()
+
 target_compile_options(bbruntime_dll PRIVATE /Gz)
 
-set(LIBS version.lib bbruntime)
+set(LIBS version.lib bbruntime dbghelp.lib)
 
 target_link_options(bbruntime_dll PRIVATE /SUBSYSTEM:WINDOWS)
 

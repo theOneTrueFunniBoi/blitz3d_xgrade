@@ -105,6 +105,104 @@ void bbDebugLog(BBStr* t)
     delete t;
 }
 
+std::vector<BlockTrace> blockTraces;
+
+void _bbPushLineTrace(int line) {
+    if (blockTraces.size() == 0) RTEX("FATAL: Unable to retrieve block trace! Block Trace size is Null!");
+    blockTraces[blockTraces.size() - 1].lineTrace = line;
+}
+
+void _bbPushBlockTrace(const char* s) {
+    try {
+        printf("BLOCKTRACE OPEN ");
+        printf(s);
+        printf("\n");
+        blockTraces.push_back(BlockTrace(string(s)));
+    }
+    catch (std::exception e) {
+        printf(e.what()); throw e;
+    }
+    catch (...) {
+        printf("what the fuck did you fucking do, YOU BROKE THE FUCKING BLOCK TRACE\n");
+    }
+}
+
+void _bbPopBlockTrace() {
+    if (blockTraces.size() == 0) RTEX("FATAL: Unable to retrieve block trace! Block Trace size is Null!");
+    printf("BLOCKTRACE CLOSE ");
+    blockTraces[blockTraces.size() - 1].file += ", line " + std::to_string(blockTraces[blockTraces.size() - 1].lineTrace);
+    printf(blockTraces[blockTraces.size() - 1].file.c_str());
+    printf("\n");
+    blockTraces.pop_back();
+}
+
+BBStr* bbGetLineTrace() {
+    string retVal = "";
+    for (int i = 0; i < blockTraces.size(); i++) {
+        retVal = blockTraces[i].file + ", line " + to_string(blockTraces[i].lineTrace) + "\n" + retVal;
+    }
+    return d_new BBStr(retVal);
+}
+
+BBStr* bbGetAddressTrace()
+{
+    string retVal = "\n\nStack addresses: \n -";
+    string tmp = "";
+
+    void* array[10];
+    unsigned short frames;
+    SYMBOL_INFO* symbol;
+    HANDLE process = GetCurrentProcess();
+
+    SymInitialize(process, NULL, TRUE);
+    frames = CaptureStackBackTrace(0, 10, array, NULL);
+    symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
+    symbol->MaxNameLen = 255;
+    symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+    for (unsigned short i = 0; i < frames; i++)
+    {
+        SymFromAddr(process, (DWORD64)(array[i]), 0, symbol);
+        tmp += "  " + (string)symbol->Name + " - 0x" + to_string(symbol->Address);
+    }
+    retVal += tmp;
+    free(symbol);
+
+    /*unsigned char c;
+    __asm movb c, eax
+    retVal = "eax=" + c;
+    __asm movb c, ebx
+    retVal += " ebx=" + c;
+    __asm movb c, ecx
+    retVal += " ecx=" + c;
+    __asm movb c, edx
+    retVal += " edx=" + c;
+    __asm movb c, esi
+    retVal += " esi=" + c;
+    __asm movb c, edi
+    retVal += " edi=" + c;
+    __asm movb c, esp
+    retVal += " esp=" + c;
+    __asm movb c, ebp
+    retVal += " ebp=" + c;
+    __asm movb c, eip
+    retVal += " eip=" + c;
+    __asm movb c, al
+    retVal += " al=" + c;
+    __asm movb c, cs
+    retVal += " cs=" + c;
+    __asm movb c, ds
+    retVal += " ds=" + c;
+    __asm movb c, ss
+    retVal += " ss=" + c;*/
+    return d_new BBStr(retVal);
+}
+
+void bbKaboom()
+{
+    *(int*)0 = 0; //nuke the fuck out of b3d, to test exception handling
+}
+
 void _bbDebugStmt(int pos, const char* file)
 {
     gx_runtime->debugStmt(pos, file);
@@ -198,7 +296,15 @@ void bbruntime_link(void (*rtSym)(const char* sym, void* pc))
     rtSym("%WaitTimer%timer", bbWaitTimer);
     rtSym("FreeTimer%timer", bbFreeTimer);
     rtSym("DebugLog$text", bbDebugLog);
-    rtSym( "$ErrorLog",bbErrorLog );
+    rtSym("$ErrorLog",bbErrorLog);
+
+    rtSym("$GetLineTrace", bbGetLineTrace);
+    rtSym("$GetAddressTrace", bbGetAddressTrace);
+    rtSym("_bbPushLineTrace", _bbPushLineTrace);
+    rtSym("_bbPushBlockTrace", _bbPushBlockTrace);
+    rtSym("_bbPopBlockTrace", _bbPopBlockTrace);
+
+    rtSym("Kaboom", bbKaboom);
 
     rtSym("_bbDebugStmt", _bbDebugStmt);
     rtSym("_bbDebugEnter", _bbDebugEnter);
@@ -300,22 +406,36 @@ bool bbruntime_create()
 
 bool bbruntime_destroy()
 {
+    printf("userlibs\n");
     userlibs_destroy();
 #if BB_BLITZ3D_ENABLED
+    printf("blitz3d\n");
     blitz3d_destroy();
+    printf("audio\n");
     audio_destroy();
+    printf("input\n");
     input_destroy();
+    printf("graphics\n");
 	graphics_destroy();
 #elif BB_LIBSGD_ENABLED
+    printf("sgd\n");
 	sgd_destroy();
 #endif
+    printf("bank\n");
     bank_destroy();
+    printf("filesystem\n");
     filesystem_destroy();
+    printf("sockets\n");
     sockets_destroy();
+    printf("stream\n");
     stream_destroy();
+    printf("string\n");
     string_destroy();
+    printf("math\n");
     math_destroy();
+    printf("basic\n");
     basic_destroy();
+    printf("everything don gon be destroyed\n");
     return true;
 }
 
@@ -324,18 +444,24 @@ const char* bbruntime_run(gxRuntime* rt, void (*pc)(), bool dbg)
     debug = dbg;
     gx_runtime = rt;
 
-    if (!bbruntime_create()) return "Unable to start program";
     const char* t = 0;
     try
     {
+        if (!bbruntime_create()) return "FATAL: Failed to initialize BlitzApplication Runtime!";
         if (!gx_runtime->idle())
             RTEX(0);
         pc();
-        gx_runtime->debugInfo("Program has ended");
+        gx_runtime->debugInfo("INFO: BlitzApplication has exited.");
     }
     catch (bbEx x)
     {
         t = x.err;
+    }
+    catch (exception e) {
+        t = e.what();
+    }
+    catch (...) {
+        t = "FATAL: Unknown, or non-standard exception thrown!";
     }
     bbruntime_destroy();
     return t;

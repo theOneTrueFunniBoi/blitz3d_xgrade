@@ -405,7 +405,7 @@ void ForEachNode::translate( Codegen *g ){
 ////////////////////////////
 void ReturnNode::semant( Environ *e ){
 	if( e->level<=0 && expr ){
-		ex( "Main program cannot return a value" );
+		ex( "Main application cannot return a value" );
 	}
 	if( e->level>0 ){
 		if( !expr ){
@@ -420,7 +420,16 @@ void ReturnNode::semant( Environ *e ){
 			}
 		}
 		expr=expr->semant( e );
+
+		//we need to close a blocktrace because return makes us leave the function's scope
+		trnode = d_new ExprStmtNode(d_new BlockTraceNode());
+		trnode->semant(e);
+		//we need a temp var
+		Decl* d = e->decls->insertDecl(genLabel(), expr->sem_type, DECL_LOCAL);
+		sem_temp = d_new DeclVarNode(d);
+
 		expr=expr->castTo( e->returnType,e );
+
 		returnLabel=e->funcLabel+"_leave";
 	}
 }
@@ -431,7 +440,13 @@ void ReturnNode::translate( Codegen *g ){
 		return;
 	}
 
-	TNode *t=expr->translate( g );
+	//set expr's value to our temp var
+	g->code(sem_temp->store(g, expr->translate(g)));
+	//close blocktrace if no errors have occurred
+	trnode->translate(g);
+
+	//now we can return
+	TNode* t = sem_temp->load(g);
 
 	if( expr->sem_type==Type::float_type ){
 		g->code( d_new TNode( IR_FRETURN,t,0,returnLabel ) );

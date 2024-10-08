@@ -21,7 +21,10 @@ public:
 	virtual void debugLeave(){}
 	virtual void debugLog( const char *msg ){}
 	virtual void debugMsg( const char *e,bool serious ){
-		if( serious ) MessageBox( 0,e,"Error!",MB_OK|MB_TOPMOST|MB_SETFOREGROUND );
+		string tmpStr = "Blitz3D UNHANDLED EXCEPTION - ";
+		tmpStr+=e;
+		tmpStr+="\n\r\n\rSCREENSHOT THIS ERROR! Press OK to exit the application.";
+		if( serious ) MessageBox( NULL,tmpStr.c_str(), "Blitz3D FATAL EXCEPTION!", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_TOPMOST | MB_SETFOREGROUND);
 	}
 	virtual void debugSys( void *msg ){}
 };
@@ -36,17 +39,19 @@ static void rtSym( const char *sym,void *pc ){
 }
 
 static void _cdecl seTranslator( unsigned int u,EXCEPTION_POINTERS* pExp ){
+	string panicStr = "Undefined Runtime Exception.";
 	switch( u ){
 	case EXCEPTION_INT_DIVIDE_BY_ZERO:
-		bbruntime_panic( "Integer divide by zero" );
+		panicStr = "Integer divide by zero!";
 	case EXCEPTION_ACCESS_VIOLATION:
-		bbruntime_panic( "Memory access violation" );
+		panicStr = "Memory access violation!";
 	case EXCEPTION_ILLEGAL_INSTRUCTION:
-		bbruntime_panic( "Illegal instruction" );
+		panicStr = "Illegal Instruction!";
 	case EXCEPTION_STACK_OVERFLOW:
-		bbruntime_panic( "Stack overflow!" );
+		panicStr = "Stack Overflow!";
 	}
-	bbruntime_panic( "Unknown runtime exception" );
+	panicStr = "FATAL: "+panicStr;
+	bbruntime_panic( panicStr.c_str() );
 }
 
 int Runtime::version(){
