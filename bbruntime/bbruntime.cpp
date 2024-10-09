@@ -2,6 +2,10 @@
 #include "bbsys.h"
 #include "bbruntime.h"
 
+const BBStr* overrideLineTrace = (BBStr*)"";
+const BBStr* overrideAddressTrace = (BBStr*)"";
+bool overrideTrace = false;
+
 void bbEnd()
 {
     RTEX(0);
@@ -43,7 +47,8 @@ void bbRuntimeErrorPrevTrace(BBStr* str)
         tmp = blockTraces[i].file + ", line " + to_string(blockTraces[i].lineTrace) + "\n" + tmp;
     }
     BBStr tmp2 = (BBStr)tmp;
-    bbEx::overrideLineTrace = &tmp2;
+    //bbEx::overrideLineTrace = &tmp2;
+    overrideLineTrace = &tmp2;
     tmp = "";
     tmp2 = "";
 
@@ -64,9 +69,11 @@ void bbRuntimeErrorPrevTrace(BBStr* str)
         tmp += "  " + (string)symbol->Name + " - 0x" + to_string(symbol->Address);
     }
     tmp2 = (BBStr)tmp;
-    bbEx::overrideAddressTrace = &tmp2;
+    //bbEx::overrideAddressTrace = &tmp2;
+    overrideAddressTrace = &tmp2;
     free(symbol);
-    bbEx::overrideTrace = true;
+    //bbEx::overrideTrace = true;
+    overrideTrace = true;
     RTEX(err);
 }
 
@@ -77,7 +84,8 @@ void bbRuntimeErrorNoTrace(BBStr* str)
     if (t.size() > 255) t[255] = 0;
     static char err[256];
     strcpy(err, t.c_str());
-    bbEx::overrideTrace = true;
+    //bbEx::overrideTrace = true;
+    overrideTrace = true;
     RTEX(err);
 }
 

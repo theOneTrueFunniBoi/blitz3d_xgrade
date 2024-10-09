@@ -12,12 +12,16 @@ extern gxRuntime *gx_runtime;
 extern std::vector<std::string> errorLog;
 BBStr * bbErrorLog( );
 
+extern const BBStr* overrideLineTrace;
+extern const BBStr* overrideAddressTrace;
+extern bool overrideTrace;
+
 struct bbEx{
 	const char *err;
 
-    static const BBStr* overrideLineTrace;
-    static const BBStr* overrideAddressTrace;
-    static bool overrideTrace;
+    //static const BBStr* overrideLineTrace;
+    //static const BBStr* overrideAddressTrace;
+    //static bool overrideTrace;
 
 	bbEx( const char *e ):err(e){
         if (e) {
