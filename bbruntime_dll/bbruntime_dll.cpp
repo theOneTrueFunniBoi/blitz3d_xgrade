@@ -23,9 +23,9 @@ public:
 	virtual void debugLeave(){}
 	virtual void debugLog( const char *msg ){}
 	virtual void debugMsg( const char *e,bool serious ){
-		string tmpStr = "Blitz3D UNHANDLED EXCEPTION - ";
+		string tmpStr = "Blitz3D FATAL EXCEPTION - ";
 		tmpStr+=e;
-		tmpStr+="\n\r\n\rSCREENSHOT THIS ERROR! Press OK to exit the application.";
+		tmpStr+="\n\r\n\rSCREENSHOT THIS ERROR, AND SEND IT TO THE APPLICATION DEVELOPER! Press OK to exit the application.";
 		if( serious ) MessageBox( NULL,tmpStr.c_str(), "Blitz3D FATAL EXCEPTION!", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_TOPMOST | MB_SETFOREGROUND);
 	}
 	virtual void debugSys( void *msg ){}
@@ -42,17 +42,50 @@ static void rtSym( const char *sym,void *pc ){
 
 static void _cdecl seTranslator( unsigned int u,EXCEPTION_POINTERS* pExp ){
 	string panicStr = "Undefined Runtime Exception.";
+	string panicDesc = "This error has no provided description as of yet! If you have a description for this error, contact FUNNIMAN.";
+	bool clearDesc = false;
 	switch( u ){
 	case EXCEPTION_INT_DIVIDE_BY_ZERO:
 		panicStr = "Integer divide by zero!";
+		panicDesc = "Dividing integers by zero is an illegal operation.";
+	case EXCEPTION_FLT_DIVIDE_BY_ZERO:
+		panicStr = "Float divide by zero!";
+		panicDesc = "Dividing floats by zero is an illegal operation.";
+	case EXCEPTION_INT_OVERFLOW:
+		panicStr = "Integer overflow!";
+		panicDesc = "Integer exceeded it's absolute maximum value.";
 	case EXCEPTION_ACCESS_VIOLATION:
-		panicStr = "Memory access violation!";
+		panicStr = "Unhandled Memory access violation!";
+		panicDesc = "The application attempted to read or write to an invalid or protected memory address.";
 	case EXCEPTION_ILLEGAL_INSTRUCTION:
-		panicStr = "Illegal Instruction!";
+		panicStr = "Illegal instruction!";
+		panicDesc = "The application attempted to execute an undefined instruction.";
 	case EXCEPTION_STACK_OVERFLOW:
-		panicStr = "Stack Overflow!";
+		panicStr = "Stack overflow!";
+		panicDesc = "The application has exceeded it's stack memory limit.";
+	case EXCEPTION_INVALID_HANDLE:
+		panicStr = "Invalid handle!";
+		panicDesc = "Attempted to use invalid kernel object. Perhaps it was closed?";
+	case EXCEPTION_IN_PAGE_ERROR:
+		panicStr = "In page error!";
+		panicDesc = "Attempted to access invalid page, and the system failed to load the page.";
+	case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+		panicStr = "Array bounds exceeded!";
+		panicDesc = "Attempted to access out of bounds array element.";
+	default:
+		clearDesc = true;
 	}
-	panicStr = "FATAL: "+panicStr;
+
+	// stupid hack to only not display the desc on an undefined exception while also removing the newline
+	if (!clearDesc)
+	{
+		panicDesc = "\n" + panicDesc;
+	}
+	else {
+		panicDesc = "";
+	}
+
+	panicStr = "FATAL: \n"+panicStr+panicDesc;
 	bbruntime_panic( panicStr.c_str() );
 }
 
