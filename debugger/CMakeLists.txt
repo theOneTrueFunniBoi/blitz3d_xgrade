@@ -21,10 +21,13 @@ add_library(debugger MODULE
 	../blitzide/prefs.cpp
 	../blitzide/prefs.h
 )
+set(LIBS config)
 
 target_compile_options(debugger PRIVATE /Gz)
 
 # Need this for MFC based DLLs.
 target_compile_definitions(debugger PRIVATE _USRDLL)
+
+target_link_libraries(debugger ${LIBS})
 
 copy_dll_to_install(debugger bin/debugger)

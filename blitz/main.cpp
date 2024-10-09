@@ -48,6 +48,7 @@ static void showHelp(){
 	cout<<"-k         : dump keywords"<<endl;
 	cout<<"+k         : dump keywords and syntax"<<endl;
 	cout<<"-v		  : version info"<<endl;
+	cout<<"-hook      : use runtime hook instead of generating temp executable" << endl;
 	cout<<"-o exefile : generate executable"<<endl;
 }
 
@@ -145,7 +146,7 @@ int _cdecl main( int argc,char *argv[] ){
 
 	bool debug=false,quiet=false,veryquiet=false,compileonly=false;
 	bool dumpkeys=false,dumphelp=false,showhelp=false,dumpasm=false;
-	bool versinfo=false;
+	bool versinfo=false,hook=false;
 
 	for( int k=1;k<argc;++k ){
 
@@ -171,6 +172,8 @@ int _cdecl main( int argc,char *argv[] ){
 			dumpkeys=dumphelp=true;
 		}else if( t=="-v" ){
 			versinfo=true;
+		}else if (t=="-hook") {
+			hook = true;
 		}else if( t=="-o" ){
 			if( out_file.size() || k==argc-1 ) usageErr();
 			out_file=argv[++k];
@@ -262,37 +265,100 @@ int _cdecl main( int argc,char *argv[] ){
 
 	if( out_file.size() ){
 		if( !veryquiet ) cout<<"Creating executable \""<<out_file<<"\"..."<<endl;
-		if( !module->createExe( out_file.c_str(),(home+"/bin/runtime.dll").c_str() ) ){
-			err( "Error creating executable" );
+		if( !module->createExe( out_file.c_str(),(home+"/bin/runtime.dll").c_str(),"")) {
+			err( "Error creating executable: " + out_file);
 		}
 	}else if( !compileonly ){
-		void *entry=module->link( runtimeModule );
-		if( !entry ) return 0;
+		if ( debug || hook )
+		{
+			//old system
+			void *entry=module->link( runtimeModule );
+			if( !entry ) return 0;
 
-		HMODULE dbgHandle=0;
-		Debugger *debugger=0;
+			HMODULE dbgHandle=0;
+			Debugger *debugger=0;
 
-		if( debug ){
-			dbgHandle=LoadLibrary( (home+"/bin/debugger.dll").c_str() );
-			if( dbgHandle ){
-				typedef Debugger *(_cdecl*GetDebugger)( Module*,Environ* );
-				GetDebugger gd=(GetDebugger)GetProcAddress( dbgHandle,"debuggerGetDebugger" );
-				if( gd ) debugger=gd( module,environ );
+			if ( debug ) {
+				dbgHandle=LoadLibrary( (home+"/bin/debugger.dll").c_str() );
+				if ( dbgHandle ) {
+					typedef Debugger *(_cdecl*GetDebugger)( Module*,Environ* );
+					GetDebugger gd=(GetDebugger)GetProcAddress( dbgHandle,"debuggerGetDebugger" );
+					if( gd ) debugger=gd( module,environ );
+				}
+				if( !debugger ) err( "Error launching debugger" );
 			}
-			if( !debugger ) err( "Error launching debugger" );
+
+			if (!veryquiet) cout << "Executing..." << endl;
+			runtimeLib->execute((void(*)())entry, args.c_str(), debugger);
+
+			if (dbgHandle) FreeLibrary(dbgHandle);
 		}
+		else {
+			// trying something that hopefully makes this faster
+			module->lnkModule = module;
+			module->lnkEnviron = environ;
+			CreateDirectoryA((home+"\\bin\\tmp\\").c_str(), NULL);
+			if (debug)
+			{
+				if (!module->createExe((home + "\\bin\\tmp\\tmpapplication.exe").c_str(), (home + "/bin/runtime.dll").c_str(), (home + "/bin/debugger.dll").c_str())) {
+					err("Error creating temporary debugged executable: " + home + "\\bin\\tmp\\tmpapplication.exe");
+				}
+			}
+			else {
+				if (!module->createExe((home + "\\bin\\tmp\\tmpapplication.exe").c_str(), (home + "/bin/runtime.dll").c_str(), "")) {
+					err("Error creating temporary executable: " + home + "\\bin\\tmp\\tmpapplication.exe");
+				}
+			}
 
-		if( !veryquiet ) cout<<"Executing..."<<endl;
+			ofstream environSave;
+			environSave.open((home + "\\bin\\tmp\\tmpapplication.environ").c_str(), ios::out | ios::app | ios::binary);
+			environSave << environ;
+			environSave.close();
 
-		runtimeLib->execute( (void(*)())entry,args.c_str(),debugger );
+			if (!veryquiet) cout << "Executing..." << endl;
 
-		if( dbgHandle ) FreeLibrary( dbgHandle );
+			STARTUPINFO si;
+			PROCESS_INFORMATION pi;
+			ZeroMemory(&si, sizeof(si)); si.cb = sizeof(si);
+			ZeroMemory(&pi, sizeof(pi));
+			if (debug)
+			{
+				if (!CreateProcessA((char*)(home + "\\bin\\tmp\\tmpapplication.exe").c_str(), "/DEBUG", NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+					::MessageBox(0, "Unable to execute compiled temporary application!", "Blitz Basic Error", MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR);
+					ExitProcess(-1);
+				}
+			}
+			else {
+				if (!CreateProcessA((char*)(home + "\\bin\\tmp\\tmpapplication.exe").c_str(), NULL, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+					::MessageBox(0, "Unable to execute compiled temporary application!", "Blitz Basic Error", MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR);
+					ExitProcess(-1);
+				}
+			}
+
+			//wait for tmpapplication to start
+			//WaitForInputIdle(pi.hProcess, INFINITE);
+
+			//wait for tmpapplication to end
+			if (!veryquiet) cout << "Waiting for temporary application to end..." << endl;
+			WaitForSingleObject(pi.hProcess, INFINITE);
+			if (!veryquiet) cout << "Cleaning up..." << endl;
+			remove((home + "\\bin\\tmp\\tmpapplication.exe").c_str());
+			remove((home + "\\bin\\tmp\\tmpapplication.environ").c_str());
+			RemoveDirectoryA((home + "\\bin\\tmp\\").c_str());
+
+			// Close process and thread handles. 
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+
+		}
 	}
 
 	delete module;
 	delete environ;
 
 	closeLibs();
+
+	if (!veryquiet) cout << "Compilation complete!" << endl;
 
 	return 0;
 }

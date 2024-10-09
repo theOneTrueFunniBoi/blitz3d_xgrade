@@ -2,12 +2,14 @@
 #ifndef LINKER_H
 #define LINKER_H
 
+#include "../compiler/environ.h"
+
 class Module{
 public:
 	virtual ~Module(){}
 
 	virtual void *link( Module *libs )=0;
-	virtual bool createExe( const char *exe_file,const char *dll_file )=0;
+	virtual bool createExe( const char *exe_file,const char *dll_file,const char *debugger_dll )=0;
 
 	virtual int getPC()=0;
 
@@ -20,6 +22,8 @@ public:
 	virtual bool addReloc( const char *dest_sym,int pc,bool pcrel )=0;
 
 	virtual bool findSymbol( const char *sym,int *pc )=0;
+	Environ* lnkEnviron=0;
+	Module* lnkModule=0;
 };
 
 class Linker{

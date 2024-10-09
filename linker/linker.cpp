@@ -2,6 +2,8 @@
 #include "std.h"
 #include "linker.h"
 #include "image_util.h"
+#include "../bbruntime_dll/bbruntime_dll.h"
+#include "../blitz/libs.h"
 
 class BBModule : public Module{
 public:
@@ -10,7 +12,7 @@ public:
 	~BBModule();
 
 	void *link( Module *libs );
-	bool createExe( const char *exe_file,const char *dll_file );
+	bool createExe( const char *exe_file,const char *dll_file,const char *debugger_dll );
 
 	int getPC();
 
@@ -35,7 +37,7 @@ private:
 		if( findSymbol( t.c_str(),n ) ) return true;
 		if( libs->findSymbol( t.c_str(),n ) ) return true;
 		string err="Symbol '"+t+"' not found";
-		MessageBox( GetDesktopWindow(),err.c_str(),"Blitz Linker Error",MB_TOPMOST|MB_SETFOREGROUND );
+		MessageBox( GetDesktopWindow(),err.c_str(),"Blitz Linker Error",MB_SYSTEMMODAL|MB_ICONERROR|MB_TOPMOST|MB_SETFOREGROUND );
 		return false;
 	}
 
@@ -145,12 +147,30 @@ Linker *_cdecl linkerGetLinker(){
 	static Linker linker;return &linker;
 }
 
-bool BBModule::createExe( const char *exe_file,const char *dll_file ){
+bool BBModule::createExe( const char *exe_file,const char *dll_file,const char *debugger_dll) {
 
 	//find proc address of bbWinMain
 	HMODULE hmod=LoadLibrary( dll_file );if( !hmod ) return false;
 	int proc=(int)GetProcAddress( hmod,"_bbWinMain@0" );
 	int entry=proc-(int)hmod;FreeLibrary( hmod );if( !proc ) return false;
+
+	if (!(debugger_dll = ""))
+	{
+		HMODULE dbgHandle = 0;
+		Debugger* debugger = 0;
+
+		dbgHandle = LoadLibrary((home + "/bin/debugger.dll").c_str());
+		if (dbgHandle) {
+			typedef Debugger* (_cdecl* GetDebugger)(Module*, Environ*);
+			GetDebugger gd = (GetDebugger)GetProcAddress(dbgHandle, "debuggerGetDebugger");
+			if (gd) debugger = gd(lnkModule, lnkEnviron);
+		}
+
+		if (!debugger) {
+			cout << "Error launching debugger" << endl;
+			exit(-1);
+		}
+	}
 
 	if( !CopyFile( dll_file,exe_file,false ) ) return false;
 

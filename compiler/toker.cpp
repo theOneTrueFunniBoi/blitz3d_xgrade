@@ -34,9 +34,11 @@ static void makeKeywords(){
 	alphaTokes["Step"]=STEP;
 	alphaTokes["Next"]=NEXT;
 	alphaTokes["Function"]=FUNCTION;
-	alphaTokes["End Function"]=ENDFUNCTION;
+	alphaTokes["EndFunction"]=ENDFUNCTION;
+	alphaTokes["End Function"] = ENDFUNCTION;
 	alphaTokes["Type"]=TYPE;
-	alphaTokes["End Type"]=ENDTYPE;
+	alphaTokes["EndType"]=ENDTYPE;
+	alphaTokes["End Type"] = ENDTYPE;
 	alphaTokes["Each"]=EACH;
 	alphaTokes["Local"]=LOCAL;
 	alphaTokes["Global"]=GLOBAL;

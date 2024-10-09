@@ -3,6 +3,8 @@
 
 #include "bbruntime_dll.h"
 #include "../debugger/debugger.h"
+//#include "../compiler/environ.h"
+//#undef environ
 
 using namespace std;
 
@@ -268,6 +270,9 @@ int __stdcall bbWinMain(){
 
 	link();
 
+	HMODULE dbgHandle = 0;
+	Debugger* debugger = 0;
+
 	//get cmd_line and params
 	string cmd=GetCommandLine(),params;
 	while( cmd.size() && cmd[0]==' ' ) cmd=cmd.substr( 1 );
@@ -277,7 +282,56 @@ int __stdcall bbWinMain(){
 			params=cmd.substr( n+1 );
 			cmd=cmd.substr( 1,n-1 );
 		}
-	}else{
+	}
+	else if (!(cmd.find("/DEBUG")==std::string::npos)) {
+		//acquire debugger
+		dbgHandle = LoadLibrary("debugger.dll");
+		if (!dbgHandle)
+		{
+			//perhaps it is in the parent dir?
+			dbgHandle = LoadLibrary("../debugger.dll");
+			if (!dbgHandle)
+			{
+				MessageBoxA(NULL, "Unable to acquire debugger", "Blitz Debugger Fatal Error", MB_SYSTEMMODAL|MB_ICONERROR|MB_TOPMOST);
+				exit(-1);
+			}
+		}
+		if (dbgHandle) {
+			ifstream environSave;
+			environSave.open("tmpapplication.environ", ios::out | ios::app | ios::binary);
+			if (!environSave.is_open())
+			{
+				//perhaps it is in the parent dir?
+				environSave.open("../tmpapplication.environ", ios::out | ios::app | ios::binary);
+				if (!environSave.is_open())
+				{
+					MessageBoxA(NULL, "Unable to acquire code environment", "Blitz Debugger Fatal Error", MB_SYSTEMMODAL | MB_ICONERROR | MB_TOPMOST);
+					exit(-1);
+				}
+			}
+
+			streampos size = environSave.tellg();
+
+			char* cEnviron = new char[size];
+
+			environSave.seekg(0, ios::beg);
+			//this is probably a really bad idea, but fuck it
+			environSave.read((char*)environ, size);
+
+			environSave.close();
+			//typedef Debugger* (_cdecl* GetDebugger)(HMODULE,char*);
+			//GetDebugger gd = (GetDebugger)GetProcAddress(dbgHandle, "debuggerGetDebugger");
+			//if (gd) debugger = gd(inst, cEnviron);
+			debugger = (Debugger*)GetProcAddress(dbgHandle, "debuggerGetDebugger");
+
+			//delete[] environ;
+		}
+
+		if (!debugger) {
+			MessageBoxA(NULL, "Error launching debugger", "Blitz Debugger Fatal Error", MB_SYSTEMMODAL | MB_ICONERROR | MB_TOPMOST);
+			exit(-1);
+		}
+	} else {
 		int n=cmd.find( ' ' );
 		if( n!=string::npos ){
 			params=cmd.substr( n+1 );
@@ -285,7 +339,12 @@ int __stdcall bbWinMain(){
 		}
 	}
 
-	runtime->execute( (void(*)())module_pc,params.c_str(),0 );
+	if (!!debugger)
+	{
+		runtime->execute((void(*)())module_pc, params.c_str(), debugger);
+	} else {
+		runtime->execute((void(*)())module_pc, params.c_str(), 0);
+	}
 	runtime->shutdown();
 
 	_DllMainCRTStartup( inst,DLL_PROCESS_DETACH,0 );

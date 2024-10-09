@@ -31,8 +31,14 @@ struct bbEx{
                 panicStr += "\n\nStack line trace:\n";
                 try {
                     string tmp = "";
-                    for (int i = 0; i < blockTraces.size(); i++) {
-                        tmp = " -   " + blockTraces[i].file + ", line " + to_string(blockTraces[i].lineTrace) + "\n" + tmp;
+                    if (blockTraces.size() > 0)
+                    {
+                        for (int i = 0; i < blockTraces.size(); i++) {
+                            tmp = " -   " + blockTraces[i].file + ", line " + to_string(blockTraces[i].lineTrace) + "\n" + tmp;
+                        }
+                    }
+                    else {
+                        tmp = " -   BLOCK TRACE SIZE IS NULL - CANNOT COMPUTE";
                     }
                     panicStr += tmp;
 
