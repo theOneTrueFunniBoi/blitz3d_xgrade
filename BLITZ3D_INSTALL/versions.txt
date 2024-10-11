@@ -16,6 +16,22 @@ Fixed '*' not showing up on the titles of modified documents.
 
 Fixed LoadFont() requiring the font's filename to match the font's internal name.
 
+
+***** V1.119 *****
+
+Merged FP bug fix.
+
+
+***** V1.118 *****
+
+Added ':Int', ':Float' and ':String' as aliases for '%', '#' and '$' to modern dialect. Note: these are only avail for use with explicit Local
+or Global variable declarations.
+
+Fixed ':' statement separator in modern dialect with sequences of single identifier statements, eg: 'UpdateWorld:RenderScene:Preset'
+
+Added /* and */ block comments to all dialects. These must appear at start of line, and can be nested.
+
+
 ***** V1.117 *****
 
 Added new Dialect keyword/command.
@@ -28,7 +44,7 @@ doing this automatically creates a local variable for you, which can be very ann
 Dialect "modern" is secure Blitz3d, but with slightly more modern syntax. It allows you to use ':' instead of '.' to declare
 variable types, and '.' instead of '\' to access fields.
 
-Dialect must appear at the top of each source file you want it to affect, included files dont 'inherit' dialect form the file
+Dialect must appear at the top of each source file you want it to affect, ie: included files don't 'inherit' dialect from the file
 that included them.
 
 Also tweaked the IDE about box to provide more version details and runtime build type (LbSGD, SoLoud, FMOD).

@@ -63,6 +63,7 @@ private:
 	//void exception(const string& s);
 	void nextline();
 	int curr_row,curr_toke;
+	int rem_nest;
 };
 
 #endif
