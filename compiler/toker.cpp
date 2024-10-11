@@ -149,6 +149,7 @@ void Toker::nextline() {
 
 	while (k < line.size()) {
 		int c = line[k], from = k;
+		int n = line[k + 1];
 		if (c == '\n') {
 			tokes.push_back(Toke(c, from, ++k));
 			continue;
@@ -157,7 +158,7 @@ void Toker::nextline() {
 			++k;
 			continue;
 		}
-		if (c == ';') {
+		if (c == ';' || (c == '/' && n == '/')) {
 			for (++k; line[k] != '\n'; ++k) {}
 			continue;
 		}
@@ -218,7 +219,6 @@ void Toker::nextline() {
 			tokes.push_back(Toke(STRINGCONST, from, k));
 			continue;
 		}
-		int n = line[k + 1];
 		if ((c == '<' && n == '>') || (c == '>' && n == '<')) {
 			tokes.push_back(Toke(NE, from, k += 2));
 			continue;
