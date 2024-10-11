@@ -3,24 +3,29 @@
 ;
 ;Create executable in 'bin'
 
-AppTitle CommandLine$()
+AppTitle "Blitz3D Media Viewer: Initializing"
 fil$=Lower$( CommandLine$() )
 
 index=Instr( fil$,"." )
 If index>0 ext$=Mid$( fil$,index+1 )
 Select ext$
-Case "x","3ds"
+Case "x","3ds","b3d"
+	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 	ShowModel( fil$,False )
 Case "md2"
+	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 	ShowModel( fil$,True )
 Case "bmp","jpg","png","pcx","tga","iff"
+	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 	ShowImage( fil$ )
-Case "wav"
+Case "wav","ogg"
+	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 	ShowSound( fil$ )
 Case "mp3","mid","mod","x3m","xm","it"
+	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 	ShowMusic( fil$ )
 Default
-	RuntimeError "Unknown File Extension"
+	RuntimeError ("Invalid File Extension: '"+ext+"'")
 End Select
 
 End

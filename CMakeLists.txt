@@ -60,6 +60,7 @@ function(copy_exe_to_install target dst)
 endfunction()
 
 add_subdirectory(config)
+add_subdirectory(versionconfig)
 add_subdirectory(stdutil)
 add_subdirectory(compiler)
 add_subdirectory(blitz)

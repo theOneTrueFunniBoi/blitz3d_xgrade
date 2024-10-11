@@ -41,7 +41,7 @@ Or you could run the following shell/DOS command:
 cmake --build cmake-build-release --config Release
 ```
 
-Assuming all went well, the "BLITZ3D_INSTALL" directory will contain the final binaries, simply run "SoLoud-MAVLess.exe" to get blitzing!
+Assuming all went well, the "BLITZ3D_INSTALL" directory will contain the final binaries, simply run "Mavless-Launcher.exe" to get blitzing!
 
 ### To disable FMod
 Open "CMakeLists.txt"

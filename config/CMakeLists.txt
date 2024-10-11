@@ -5,8 +5,8 @@ project(config)
 add_library(config
         config.cpp
         config.h
-	versionconfig.cpp
-	versionconfig.h
 )
+set(LIBS versionconfig)
+target_link_libraries(config ${LIBS})
 
 target_compile_options(config PRIVATE /Gz)

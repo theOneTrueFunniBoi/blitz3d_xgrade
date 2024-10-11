@@ -4,7 +4,7 @@
 #include "debuggerapp.h"
 #include "resource.h"
 #include "../blitzide/prefs.h"
-#include "../config/versionconfig.h"
+#include "../versionconfig/versionconfig.h"
 
 DebuggerApp debuggerApp;
 
@@ -27,7 +27,10 @@ BOOL DebuggerApp::InitInstance(){
 	int h=240;
 	int y=rect.bottom-h;
 
-	main_frame->Create( 0,(VersionConfig::blitzIdentShort+" Debugger").c_str(),
+	// hack to get around shit
+	string tmp = VersionConfig::blitzIdent;
+
+	main_frame->Create( 0,(tmp+" Debugger").c_str(),
 		WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN,
 		CRect( x,y,x+w,y+h ) );
 	main_frame->ShowWindow( SW_SHOW );

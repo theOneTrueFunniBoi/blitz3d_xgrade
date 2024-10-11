@@ -10,7 +10,7 @@ build.txt
 
 fmod375/lib/fmod.dll
 
-BLITZ3D_INSTALL/SoLoud-MAVLess.exe
+BLITZ3D_INSTALL/Mavless-Launcher.exe
 BLITZ3D_INSTALL/bin/*
 BLITZ3D_INSTALL/cfg/blitzide.prefs
 BLITZ3D_INSTALL/tmp/*.bb

@@ -8,10 +8,10 @@ add_executable(bblaunch WIN32
         bblaunch.rc
         )
 
-set(LIBS config)
+set(LIBS versionconfig)
 
 target_compile_options(bblaunch PRIVATE /Gz)
 
 target_link_libraries(bblaunch ${LIBS})
 
-copy_exe_to_install(bblaunch SoLoud-MAVLess)
+copy_exe_to_install(bblaunch Mavless-Launcher)

@@ -22,7 +22,7 @@
 #include "../blitz3d/listener.h"
 #include "../blitz3d/cachedtexture.h"
 
-#include "../config/versionconfig.h"
+#include "../versionconfig/versionconfig.h"
 
 gxScene *gx_scene;
 extern gxFileSystem *gx_filesys;
@@ -2289,17 +2289,17 @@ BBStr *bbBlitzVersion()
 
 BBStr* bbBlitzIdent()
 {
-	return new BBStr(VersionConfig::blitzIdent.c_str());
+	return new BBStr(VersionConfig::blitzIdent);
 }
 
 BBStr* bbBlitzShortIdent()
 {
-	return new BBStr(VersionConfig::blitzIdentShort.c_str());
+	return new BBStr(VersionConfig::blitzIdentShort);
 }
 
 BBStr* bbBlitzShortestIdent()
 {
-	return new BBStr(VersionConfig::blitzIdentShortest.c_str());
+	return new BBStr(VersionConfig::blitzIdentShortest);
 }
 
 void  bbClearWorld( int e,int b,int t ){

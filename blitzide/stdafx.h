@@ -21,7 +21,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "../config/versionconfig.h"
+#include "../versionconfig/versionconfig.h"
 
 using namespace std;
 

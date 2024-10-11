@@ -69,6 +69,8 @@ void aboutBlitz(bool delay) {
 	string ide_v=itoa(ide_ver/1000)+"."+itoa(ide_ver%1000);
 	string lnk_v=itoa(lnk_ver/1000)+"."+itoa(lnk_ver%1000);
 	string run_v=itoa(run_ver/1000)+"."+itoa(run_ver%1000);
+	// hack to get around shit
+	string tmp = VersionConfig::blitzIdent;
 
 	string credits = _credits;
 	credits += VersionConfig::blitzIdentShortest;
@@ -91,7 +93,7 @@ void aboutBlitz(bool delay) {
 
 	about.GetDlgItem(IDC_CREDITS)->SetWindowText(credits.c_str());
 
-	string t= VersionConfig::blitzIdentShort+" IDE v"+ide_v;
+	string t= tmp+" IDE v"+ide_v;
 	about.GetDlgItem( IDC_PRODUCT )->SetWindowText( t.c_str() );
 
 	t="Compiler v"+bcc_v +" Linker v"+lnk_v;

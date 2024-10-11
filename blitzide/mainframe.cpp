@@ -210,7 +210,9 @@ void MainFrame::OnDestroy(){
 }
 
 void MainFrame::setTitle( const string &s ){
-	SetWindowText((VersionConfig::blitzIdent+" -- "+s).c_str());
+	// hack to get around shit
+	string tmp = VersionConfig::blitzIdent;
+	SetWindowText((tmp+" -- "+s).c_str());
 }
 
 void MainFrame::OnClose(){
@@ -240,13 +242,16 @@ void MainFrame::OnSize( UINT type,int sw,int sh ){
 	tabber.MoveWindow( x,y,w,h );
 }
 
-static char *bbFilter=
+static char* bbFilter =
 
-"Blitz Basic files (.bb)|*.bb|"
-"INI Configuration files (.ini)|*.ini|"
-"Image files (.bmp,.jpg,.png,.tga,.iff,.pcx)|*.bmp;*.jpg;*.png;*.tga;*.iff;*.pcx|"
-"Audio files (.wav,.mid,.mod,.mp3,.s3m,.xm,.it,.rmi,.sgt)|*.wav;*.mid;*.mod;*.mp3;*.s3m;*.xm;*.it;*.rmi;*.sgt|"
-"3D Mesh files (.x,.3ds,.md2)|*.x;*.3ds;*.md2|"
+"Blitz Basic code documents|*.bb|"
+"Blitz Basic code backups|*.bb_bak1;*.bb_bak2|"
+"Configuration files|*.cfg;*.ini;*.txt;*.xml|"
+"Text documents|*.txt;*.md|"
+"Images|*.bmp;*.iff;*.jpg;*.ogg;*.pcx;*.png;*.tga|"
+"Audio clips|*.it;*.mid;*.mod;*.mp3;*.rmi;*.s3m;*.sgt;*.wav;*.xm|"
+"3D Mesh data|*.3ds;*.b3d;*.fbx;*.md2;*.obj;*.x|"
+"Decompiled 3D Map information|*.vmf|"
 "All files|*.*||";
 
 Editor *MainFrame::getEditor(){
@@ -391,7 +396,7 @@ bool MainFrame::open( const string &f ){
 	}
 
 	if( isMediaFile( tolower( file ) ) ){
-		string t=prefs.homeDir+"/bin/mediaview.exe";
+		string t=prefs.homeDir+"/bin/blitzviewer.exe";
 		if( (int)ShellExecute( ::GetDesktopWindow(),0,t.c_str(),file.c_str(),0,SW_SHOW )>32 ){
 		}
 		return false;
