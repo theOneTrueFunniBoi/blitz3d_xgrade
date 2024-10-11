@@ -565,14 +565,14 @@ void gxRuntime::debugLeave(){
 ////////////////
 // DEBUGERROR //
 ////////////////
-void gxRuntime::debugError( const char *t ){
+void gxRuntime::debugError( const char *t,bool ovr ){
 	if( !debugger ) return;
 	Debugger *d=debugger;
 	asyncEnd();
 	if( !suspended ){
 		forceSuspend();
 	}
-	d->debugMsg( t,true );
+	d->debugMsg( t,true,ovr );
 }
 
 ///////////////

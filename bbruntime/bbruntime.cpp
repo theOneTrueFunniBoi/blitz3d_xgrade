@@ -2,9 +2,14 @@
 #include "bbsys.h"
 #include "bbruntime.h"
 
-const BBStr* overrideLineTrace = (BBStr*)"";
-const BBStr* overrideAddressTrace = (BBStr*)"";
+//const BBStr* overrideLineTrace = d_new BBStr("");
+//const BBStr* overrideAddressTrace = d_new BBStr("");
+//const BBStr* overrideLineTrace = (BBStr*)"";
+//const BBStr* overrideAddressTrace = (BBStr*)"";
+const BBStr* overrideLineTrace;
+const BBStr* overrideAddressTrace;
 bool overrideTrace = false;
+bool overrideDef = false;
 
 void bbEnd()
 {
@@ -23,70 +28,6 @@ void bbAppTitle(BBStr* ti, BBStr* cp)
     gx_runtime->setTitle(*ti, *cp);
     delete ti;
     delete cp;
-}
-
-void bbRuntimeError(BBStr* str)
-{
-    string t = *str;
-    delete str;
-    if (t.size() > 255) t[255] = 0;
-    static char err[256];
-    strcpy(err, t.c_str());
-    RTEX(err);
-}
-
-void bbRuntimeErrorPrevTrace(BBStr* str)
-{
-    string t = *str;
-    delete str;
-    if (t.size() > 255) t[255] = 0;
-    static char err[256];
-    strcpy(err, t.c_str());
-    string tmp = "";
-    for (int i = 0; i < blockTraces.size(); i++) {
-        tmp = blockTraces[i].file + ", line " + to_string(blockTraces[i].lineTrace) + "\n" + tmp;
-    }
-    BBStr tmp2 = (BBStr)tmp;
-    //bbEx::overrideLineTrace = &tmp2;
-    overrideLineTrace = &tmp2;
-    tmp = "";
-    tmp2 = "";
-
-    void* array[10];
-    unsigned short frames;
-    SYMBOL_INFO* symbol;
-    HANDLE process = GetCurrentProcess();
-
-    SymInitialize(process, NULL, TRUE);
-    frames = CaptureStackBackTrace(0, 10, array, NULL);
-    symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
-    symbol->MaxNameLen = 255;
-    symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-
-    for (unsigned short i = 0; i < frames; i++)
-    {
-        SymFromAddr(process, (DWORD64)(array[i]), 0, symbol);
-        tmp += "  " + (string)symbol->Name + " - 0x" + to_string(symbol->Address);
-    }
-    tmp2 = (BBStr)tmp;
-    //bbEx::overrideAddressTrace = &tmp2;
-    overrideAddressTrace = &tmp2;
-    free(symbol);
-    //bbEx::overrideTrace = true;
-    overrideTrace = true;
-    RTEX(err);
-}
-
-void bbRuntimeErrorNoTrace(BBStr* str)
-{
-    string t = *str;
-    delete str;
-    if (t.size() > 255) t[255] = 0;
-    static char err[256];
-    strcpy(err, t.c_str());
-    //bbEx::overrideTrace = true;
-    overrideTrace = true;
-    RTEX(err);
 }
 
 int bbExecFile(BBStr* f)
@@ -194,7 +135,8 @@ void _bbPopBlockTrace() {
     blockTraces.pop_back();
 }
 
-BBStr* bbGetLineTrace() {
+BBStr* bbGetLineTrace()
+{
     string retVal = "";
     for (int i = 0; i < blockTraces.size(); i++) {
         retVal = blockTraces[i].file + ", line " + to_string(blockTraces[i].lineTrace) + "\n" + retVal;
@@ -254,6 +196,57 @@ BBStr* bbGetAddressTrace()
     __asm movb c, ss
     retVal += " ss=" + c;*/
     return d_new BBStr(retVal);
+}
+
+void bbRuntimeError(BBStr* str, int type)
+{
+    string t = *str;
+    delete str;
+
+    string tmp = "";
+    BBStr tmp2 = "";
+
+    static char err[512];
+
+    HANDLE process = GetCurrentProcess();
+
+    switch (type)
+    {
+
+        // prev-stacktrace (after furthur inspection, this really has no difference, gonna replace with default)
+    //case 1:
+    //    if (t.size() > 512) t[512] = 0;
+    //    strcpy(err, t.c_str());
+    //    overrideLineTrace = bbGetLineTrace();
+    //    overrideAddressTrace = bbGetAddressTrace();
+    //    overrideTrace = true;
+    //    RTEX(err);
+    //    break;
+
+        // no stacktrace
+    case 2:
+        if (t.size() > 512) t[512] = 0;
+        strcpy(err, t.c_str());
+        //bbEx::overrideTrace = true;
+        overrideTrace = true;
+        RTEX(err);
+        break;
+
+        // pre-stacktrace
+    case 3:
+        if (t.size() > 512) t[512] = 0;
+        strcpy(err, t.c_str());
+        overrideDef = true;
+        RTEX(err);
+        break;
+
+        // default, with stacktrace
+    default:
+        if (t.size() > 512) t[512] = 0;
+        strcpy(err, t.c_str());
+        RTEX(err);
+        break;
+    }
 }
 
 void bbKaboom()
@@ -341,9 +334,7 @@ void bbruntime_link(void (*rtSym)(const char* sym, void* pc))
     rtSym("End", bbEnd);
     rtSym("Stop", bbStop);
     rtSym("AppTitle$title$close_prompt=\"\"", bbAppTitle);
-    rtSym("RuntimeError$message", bbRuntimeError);
-    rtSym("RuntimeErrorPrevTrace$message", bbRuntimeErrorPrevTrace);
-    rtSym("RuntimeErrorNoTrace$message", bbRuntimeErrorNoTrace);
+    rtSym("RuntimeError$message%type=0", bbRuntimeError);
     rtSym("ExecFile$command", bbExecFile);
     rtSym("Delay%millisecs", bbDelay);
     rtSym("%MilliSecs", bbMilliSecs);
@@ -358,8 +349,8 @@ void bbruntime_link(void (*rtSym)(const char* sym, void* pc))
     rtSym("DebugLog$text", bbDebugLog);
     rtSym("$ErrorLog",bbErrorLog);
 
-    rtSym("$GetLineTrace", bbGetLineTrace);
-    rtSym("$GetAddressTrace", bbGetAddressTrace);
+    rtSym("$GetFullLineTrace", bbGetLineTrace);
+    rtSym("$GetFullAddressTrace", bbGetAddressTrace);
     rtSym("_bbPushLineTrace", _bbPushLineTrace);
     rtSym("_bbPushBlockTrace", _bbPushBlockTrace);
     rtSym("_bbPopBlockTrace", _bbPopBlockTrace);

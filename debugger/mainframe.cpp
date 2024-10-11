@@ -208,7 +208,7 @@ void MainFrame::debugLeave(){
 	locals_tree.popFrame();
 }
 
-void MainFrame::debugMsg( const char *msg,bool serious ){
+void MainFrame::debugMsg( const char *msg,bool serious, bool ovr ){
 	if( serious ){
 		::MessageBox( 0,msg,"Runtime Error",MB_OK|MB_ICONWARNING|MB_TOPMOST|MB_SETFOREGROUND );
 	}else{

@@ -22,11 +22,17 @@ public:
 	virtual void debugEnter( void *frame,void *env,const char *func ){}
 	virtual void debugLeave(){}
 	virtual void debugLog( const char *msg ){}
-	virtual void debugMsg( const char *e,bool serious ){
-		string tmpStr = "Blitz3D FATAL EXCEPTION - ";
-		tmpStr+=e;
-		tmpStr+="\n\r\n\rSCREENSHOT THIS ERROR, AND SEND IT TO THE APPLICATION DEVELOPER! Press OK to exit the application.";
-		if( serious ) MessageBox( NULL,tmpStr.c_str(), "Blitz3D FATAL EXCEPTION!", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_TOPMOST | MB_SETFOREGROUND);
+	virtual void debugMsg( const char *e,bool serious,bool ovr ){
+		if (!ovr)
+		{
+			string tmpStr = "Blitz3D FATAL EXCEPTION - ";
+			tmpStr += e;
+			tmpStr += "\n\r\n\rSCREENSHOT THIS ERROR, AND SEND IT TO THE APPLICATION DEVELOPER! Press OK to exit the application.";
+			if (serious) MessageBox(NULL, tmpStr.c_str(), "Blitz3D FATAL EXCEPTION!", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_TOPMOST | MB_SETFOREGROUND);
+		}
+		else {
+			if (serious) MessageBox(NULL, e, "Error!", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_TOPMOST | MB_SETFOREGROUND);
+		}
 	}
 	virtual void debugSys( void *msg ){}
 };

@@ -119,7 +119,7 @@ public:
 	void debugEnter( void *frame,void *env,const char *func );
 	void debugLeave();
 	void debugInfo( const char *t );
-	void debugError( const char *t );
+	void debugError( const char *t,bool ovr );
 	void debugLog( const char *t );
 
 	int numGraphicsDrivers();

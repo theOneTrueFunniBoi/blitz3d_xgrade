@@ -34,7 +34,7 @@ public:
 	void debugEnter( void *frame,void *env,const char *func );
 	void debugLeave();
 	void debugLog( const char *msg );
-	void debugMsg( const char *msg,bool serious );
+	void debugMsg( const char *msg,bool serious,bool ovr=false );
 	void debugSys( void *msg );
 
 	void showCurStmt();

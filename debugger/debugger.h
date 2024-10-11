@@ -10,7 +10,7 @@ public:
 	virtual void debugEnter( void *frame,void *env,const char *func )=0;
 	virtual void debugLeave()=0;
 	virtual void debugLog( const char *msg )=0;
-	virtual void debugMsg( const char *msg,bool serious )=0;
+	virtual void debugMsg( const char *msg,bool serious,bool ovr=false )=0;
 	virtual void debugSys( void *msg )=0;
 };
 
