@@ -2,6 +2,13 @@
 #include "gxruntime.h"
 #include "zmouse.h"
 
+#include "intrin.h"
+
+// wiinnt.h doesn't have definitions for these, so im just gonna put them here and hope they don't fuck anything up
+#define PROCESSOR_ARCHITECTURE_ARM64            12
+#define PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64   13
+#define PROCESSOR_ARCHITECTURE_IA32_ON_ARM64    14
+
 #ifndef SPI_SETMOUSESPEED
 #define SPI_SETMOUSESPEED 0x71
 #endif
@@ -1120,46 +1127,113 @@ static string toDir( string t ){
 }
 
 string gxRuntime::systemProperty( const std::string &p ){
-	char buff[MAX_PATH+1];
-	string t=tolower(p);
-	if( t=="cpu" ){
-		return "Intel";
-	}else if( t=="os" ){
-		switch( osinfo.dwMajorVersion ){
-			case 3:
-				switch( osinfo.dwMinorVersion ){
-					case 51:return "Windows NT 3.1";
-				}
-				break;
-			case 4:
-				switch( osinfo.dwMinorVersion ){
-					case 0:return "Windows 95";
-					case 10:return "Windows 98";
-					case 90:return "Windows ME";
-				}
-				break;
-			case 5:
-				switch( osinfo.dwMinorVersion ){
-					case 0:return "Windows 2000";
-					case 1:return "Windows XP";
-					case 2:return "Windows Server 2003";
-				}
-				break;
-			case 6:
-				switch( osinfo.dwMinorVersion ){
-					case 0:return "Windows Vista";
-					case 1:return "Windows 7";
-				}
-				break;
+	char buff[MAX_PATH + 1];
+	std::string t = tolower(p);
+	if (t == "os") {
+		switch (osinfo.dwMajorVersion) {
+		case 3:
+			switch (osinfo.dwMinorVersion) {
+			case 51:return "Windows NT 3.1";
+			}
+			break;
+		case 4:
+			switch (osinfo.dwMinorVersion) {
+			case 0:return "Windows 95";
+			case 10:return "Windows 98";
+			case 90:return "Windows ME";
+			}
+			break;
+		case 5:
+			switch (osinfo.dwMinorVersion) {
+			case 0:return "Windows 2000";
+			case 1:return "Windows XP";
+			case 2:return "Windows Server 2003";
+			}
+			break;
+		case 6:
+			switch (osinfo.dwMinorVersion) {
+			case 0:return "Windows Vista";
+			case 1:return "Windows 7";
+			case 2:return "Windows 8";
+			case 3:return "Windows 8.1";
+			}
+			break;
+		case 10:
+			if (osinfo.dwBuildNumber >= 22000) return "Windows 11";
+			return "Windows 10";
+			break;
 		}
-	}else if( t=="appdir" ){
-		if( GetModuleFileName( 0,buff,MAX_PATH ) ){
-			string t=buff;
-			int n=t.find_last_of( '\\' );
-			if( n!=string::npos ) t=t.substr( 0,n );
-			return toDir( t );
+	}
+	else if (t == "cpuname") {
+		//Uses the __cpuid intrinsic to get the brand name.
+		//-------RESOURCES-------
+		//https://en.wikipedia.org/wiki/CPUID#EAX=80000002h,80000003h,80000004h:_Processor_Brand_String
+		//https://docs.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex?view=msvc-160
+
+		std::string cpuBrand;
+		uint32_t regs[4];
+		int numberOfExtendedFlags;
+
+		__cpuid((int*)regs, 0x80000000);
+		numberOfExtendedFlags = regs[0];
+
+		if (numberOfExtendedFlags >= 0x80000004) {
+			__cpuid((int*)regs, 0x80000002);
+			cpuBrand += std::string((const char*)&regs[0], 4);
+			cpuBrand += std::string((const char*)&regs[1], 4);
+			cpuBrand += std::string((const char*)&regs[2], 4);
+			cpuBrand += std::string((const char*)&regs[3], 4);
+
+			__cpuid((int*)regs, 0x80000003);
+			cpuBrand += std::string((const char*)&regs[0], 4);
+			cpuBrand += std::string((const char*)&regs[1], 4);
+			cpuBrand += std::string((const char*)&regs[2], 4);
+			cpuBrand += std::string((const char*)&regs[3], 4);
+
+			__cpuid((int*)regs, 0x80000004);
+			cpuBrand += std::string((const char*)&regs[0], 4);
+			cpuBrand += std::string((const char*)&regs[1], 4);
+			cpuBrand += std::string((const char*)&regs[2], 4);
+			cpuBrand += std::string((const char*)&regs[3], 4);
 		}
-	}else if( t=="apphwnd" ){
+		else cpuBrand = getenv("PROCESSOR_IDENTIFIER"); //Should never happen, modern CPUs implement the brand name.
+
+		return cpuBrand;
+	}
+	else if (t == "cpuarch") {
+		SYSTEM_INFO systemInfo;
+		GetNativeSystemInfo(&systemInfo);
+
+		switch (systemInfo.wProcessorArchitecture) {
+		case PROCESSOR_ARCHITECTURE_AMD64:
+			return "AMD64";
+		case PROCESSOR_ARCHITECTURE_INTEL:
+			return "x86";
+			//Maybe someone runs the game under the x86 emulation layers of ARM Windows, detect it.
+		case PROCESSOR_ARCHITECTURE_ARM:
+			return "ARM32";
+		case PROCESSOR_ARCHITECTURE_ARM64:
+			return "ARM64";
+			//-------------------------------------------------------------------------------------
+		default:
+			return "Unknown";
+		}
+	}
+	else if (t == "osbuild") {
+		return itoa((int)osinfo.dwBuildNumber);
+	}
+	else if (t == "appdir") {
+		if (GetModuleFileName(0, buff, MAX_PATH)) {
+			std::string t = buff;
+			int n = t.find_last_of('\\');
+			if (n != std::string::npos) t = t.substr(0, n);
+			return toDir(t);
+		}
+	}
+	else if (t == "appfile") {
+		if (GetModuleFileName(0, buff, MAX_PATH)) return buff; //without toDir, so we don't have the slash at the end
+	}
+	else if (t == "apphwnd") {
 		return itoa( (int)hwnd );
 	}else if( t=="apphinstance" ){
 		return itoa( (int)hinst );

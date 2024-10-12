@@ -120,7 +120,7 @@ bool isMediaFile( const string &f ){
 	static char *exts[]={
 		"bmp","jpg","png","tga","iff","pcx",
 		"wav","mid","mp3","mod","s3m","xm","it","rmi","sgt",
-		"x","3ds","b3d",0
+		"x","3ds","b3d","rmesh",0
 	};
 
 	int i=f.rfind( '.' );

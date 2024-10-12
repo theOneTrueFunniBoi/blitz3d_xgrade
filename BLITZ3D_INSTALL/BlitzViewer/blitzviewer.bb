@@ -3,80 +3,111 @@
 ;
 ;Create executable in 'bin'
 
-AppTitle "Blitz3D Media Viewer: Initializing"
-fil$=Lower$( CommandLine$() )
+Global mouse_left_limit% = 250, mouse_right_limit% = GraphicsWidth () - 250
+Global mouse_top_limit% = 150, mouse_bottom_limit% = GraphicsHeight () - 150
+Global MXS#=180.0,MYS#=0.0
+Global Faster% = False
+Global Slower% = False
 
-index=Instr( fil$,"." )
-If index>0 ext$=Mid$( fil$,index+1 )
+AppTitle "Blitz3D Media Viewer: Initializing"
+Global fil$=Lower$( CommandLine$() )
+
+Global texA%[255]
+
+Global index%=Instr( fil$,"." )
+Global ext$
+
+Graphics3D 800,600,0,2
+
+If (index>0) Then ext$=Mid$( fil$,index+1 )
 Select ext$
-Case "x","3ds","b3d"
-	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
-	ShowModel( fil$,False,False )
-Case "md2"
-	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
-	ShowModel( fil$,True,False )	
-Case "rmesh"
-	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
-	ShowModel( fil$,False,True )
-Case "bmp","jpg","png","pcx","tga","iff"
-	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
-	ShowImage( fil$ )
-Case "wav","ogg"
-	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
-	ShowSound( fil$ )
-Case "mp3","mid","mod","x3m","xm","it"
-	AppTitle "Blitz3D Media Viewer: "+CommandLine$()
-	ShowMusic( fil$ )
-Default
-	RuntimeError ("Invalid File Extension: '"+ext+"'")
+	Case "x","3ds","b3d"
+		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
+		ShowModel( fil$,False,False )
+	Case "md2"
+		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
+		ShowModel( fil$,True,False )	
+	Case "rmesh"
+		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
+		ShowModel( fil$,False,True )
+	Case "bmp","jpg","png","pcx","tga","iff"
+		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
+		ShowImage( fil$ )
+	Case "wav","ogg"
+		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
+		ShowSound( fil$ )
+	Case "mp3","mid","mod","x3m","xm","it"
+		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
+		ShowMusic( fil$ )
+	Default
+		RuntimeError ("Invalid File Extension: '"+ext+"'")
 End Select
 
-End
-
-Function ShowModel( fil$,md2 )
-	If Windowed3D()
-		Graphics3D 400,300,0,2
-	Else
-		Graphics3D 640,480,0,1
-	EndIf
+Function ShowModel( fil$,md2%,rmesh% )
+	Local model%
 	If md2
 		model=LoadMD2( fil$ )
-		If model ScaleEntity model,.025,.025,.025
+		If model Then ScaleEntity model,.025,.025,.025
+	ElseIf rmesh
+		model=LoadRMesh( fil$ )
 	Else
 		model=LoadMesh( fil$ )
-		If model FitMesh model,-1,-1,-1,2,2,2,True
+		If model Then FitMesh model,-1,-1,-1,2,2,2,True
 	EndIf
-	If model=0 RuntimeError "Unable to load 3D mesh:"+fil$
-	sc=CountSurfaces(model)
-	For k=1 To sc
+	If model=0 Then RuntimeError "Unable to load 3D mesh:"+fil$
+	Local sc%=CountSurfaces(model)
+	Local vc%,tc%
+	For k%=1 To sc
 		vc=vc+CountVertices( GetSurface( model,k ) )
 		tc=tc+CountTriangles( GetSurface( model,k ) )
 	Next
-	camera=CreateCamera()
+	Local camera%=CreateCamera()
 	CameraClsColor camera,0,0,64
-	CameraRange camera,.01,10
-	xr#=0:yr#=0:z#=2.1
-	light=CreateLight()
-	TurnEntity light,45,45,0
-	Repeat
-		RotateEntity model,xr,yr,0
-		PositionEntity model,0,0,z
+	CameraRange camera,.01,20
+	Local light%=CreateLight()
+	TurnEntity light,45,45,0	
+	;MoveMouse GraphicsWidth()/2,GraphicsHeight()/2
+	Repeat	
+		Cls()
+		HidePointer()
+		
+		If (MouseX() > mouse_right_limit) Or (MouseX() < mouse_left_limit) Or (MouseY() > mouse_bottom_limit) Or (MouseY() < mouse_top_limit)
+			MoveMouse GraphicsWidth()/2,GraphicsHeight()/2
+		EndIf
+		
+		MXS# = MXS# + MouseXSpeed()*0.25
+		MYS# = MYS# + MouseYSpeed()*0.25
+		
+		MYS = Max(Min(MYS,85),-85)
+		
+		RotateEntity camera,MYS,-MXS,0
+		
+		Faster = 0
+		If KeyDown(42) Then Faster = 1
+		Slower = 0
+		If KeyDown(29) Then Slower = 1
+		
+		If KeyDown(17) Then MoveEntity camera,0,0,((0.05)+(0.05*Faster))/(1+Slower)
+		If KeyDown(30) Then MoveEntity camera,(-0.05-(0.05*Faster))/(1+Slower),0,0
+		If KeyDown(31) Then MoveEntity camera,0,0,(-0.05-(0.05*Faster))/(1+Slower)
+		If KeyDown(32) Then MoveEntity camera,(0.05+(0.05*Faster))/(1+Slower),0,0
+		
+		If KeyDown(1) Then End
+		
 		UpdateWorld
 		RenderWorld
-		Text 0,0,"Triangles:"+tc+" Vertices:"+vc+" Surfaces:"+sc
+		Text 0,0,"Triangles:"+tc+" Vertices:"+vc+" Surfaces:"+sc		
+		Text 0,15,"CameraRotX: "+MXS+" CameraRotY: "+(-MYS)
 		Flip
-		key=False
-		Repeat
-			If KeyHit(1) End
-			If KeyDown(200) xr=xr-3:key=True
-			If KeyDown(208) xr=xr+3:key=True
-			If KeyDown(203) yr=yr+3:key=True
-			If KeyDown(205) yr=yr-3:key=True
-			If KeyDown( 30) z=z-.1:key=True
-			If KeyDown( 44) z=z+.1:key=True
-			If Not key WaitKey
-		Until key
 	Forever
+End Function
+
+Function Min#(a#,b#)
+	If a < b Then Return a Else Return b
+End Function
+
+Function Max#(a#,b#)
+	If a > b Then Return a Else Return b
 End Function
 
 Function LoadRMesh(file$)
@@ -351,7 +382,8 @@ Function LoadRMesh(file$)
 				
 				temp1i=0
 				
-				/*For j = 0 To MaxRoomEmitters-1
+				/*				
+				For j = 0 To MaxRoomEmitters-1
 					If rt\TempSoundEmitter[j]=0 Then
 						rt\TempSoundEmitterX[j]=ReadFloat(f)
 						rt\TempSoundEmitterY[j]=ReadFloat(f)
@@ -362,7 +394,8 @@ Function LoadRMesh(file$)
 						temp1i=1
 						Exit
 					EndIf
-				Next*/
+				Next				
+				*/
 				
 				;If temp1i=0 Then
 					ReadFloat(f)
@@ -379,9 +412,10 @@ Function LoadRMesh(file$)
 				ReadString(f)
 			Case "model"			
 				DebugLog ("model")				
-				Local file2 = ReadString(f)
-				If file<>""
-					Local model = LoadMesh(file+"\Props\"+file2)
+				Local file2$ = ReadString(f)
+				If file2<>""			
+					Text 5,5,file+"Props\"+file2
+					Local model = LoadMesh(file+"Props\"+file2)
 					
 					;try again
 					If (Not model) Then model = LoadMesh(file+"\Props\"+file2)
@@ -391,14 +425,14 @@ Function LoadRMesh(file$)
 					If (Not model) Then RuntimeError("PropObject: '"+file+"\Props\"+file2+"' faiiled To load.")
 					
 					temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
-					PositionEntity model,temp1/10,temp2/10,temp3/10
+					PositionEntity model,temp1/100,temp2/100,temp3/100
 					
 					temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
 					RotateEntity model,temp1,temp2,temp3
 					
 					temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
 					;ScaleEntity model,temp1*rRoomScale,temp2*rRoomScale,temp3*rRoomScale
-					ScaleEntity model,temp1/10,temp2/10,temp3/10
+					ScaleEntity model,temp1/100,temp2/100,temp3/100
 					
 					;EntityParent model,Opaque
 					;EntityType model,HIT_MAP
@@ -409,7 +443,9 @@ Function LoadRMesh(file$)
 					DebugLog temp1+", "+temp2+", "+temp3
 					
 					;Stop
-				EndIf
+				EndIf				
+			Default			
+			RuntimeError("UNSUPPORTED RMesh ENTITY TYPE")
 		End Select
 	Next
 	
@@ -429,12 +465,29 @@ Function LoadRMesh(file$)
 	
 	EntityAlpha Opaque,1.0
 
-	FreeTexture blankTexture
+	FreeTexture blankTexture		
+	
+	ScaleEntity Opaque,EntityScaleX(Opaque)/100,EntityScaleY(Opaque)/100,EntityScaleZ(Opaque)/100
 	
 	CloseFile f
 	
 	Return Opaque
 End Function
+
+Function EntityScaleX#(entity%, globl% = False)
+	If globl Then TFormVector 1, 0, 0, entity, 0 Else TFormVector 1, 0, 0, entity, GetParent(entity)
+	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
+End Function 
+
+Function EntityScaleY#(entity%, globl% = False)
+	If globl Then TFormVector 0, 1, 0, entity, 0 Else TFormVector 0, 1, 0, entity, GetParent(entity)
+	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
+End Function 
+
+Function EntityScaleZ#(entity%, globl% = False)
+	If globl Then TFormVector 0, 0, 1, entity, 0 Else TFormVector 0, 0, 1, entity, GetParent(entity)
+	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
+End Function 
 
 Function StripFilename$(file$)
 	Local mi$=""
@@ -451,18 +504,66 @@ Function StripFilename$(file$)
 	Return Left(file,lastSlash)
 End Function
 
+Function StripPath$(file$) 
+	Local name$=""
+	If Len(file$)>0 
+		For i=Len(file$) To 1 Step -1 
+			
+			mi$=Mid$(file$,i,1) 
+			If mi$="\" Or mi$="/" Then Return name$
+			
+			name$=mi$+name$ 
+		Next 
+		
+	EndIf 
+	
+	Return name$ 
+End Function
+
+Type Materials
+	Field name$
+	Field Diff
+	Field Bump
+	
+	Field StepSound%
+End Type
+
+Function GetTextureFromCache%(name$)
+	For tc.Materials=Each Materials
+		If tc\name = name Then Return tc\Diff
+	Next
+	Return 0
+End Function
+
+Function GetCache.Materials(name$)
+	For tc.Materials=Each Materials
+		If tc\name = name Then Return tc
+	Next
+	Return Null
+End Function
+
+Function AddTextureToCache(texture%)
+	Local tc.Materials=GetCache(StripPath(TextureName(texture)))
+	If tc.Materials=Null Then
+		tc.Materials=New Materials
+		tc\name=StripPath(TextureName(texture))
+		tc\Diff=0
+	EndIf
+	If tc\Diff=0 Then tc\Diff=texture
+End Function
+
 Function ShowImage( fil$ )
-	Graphics 400,300,0,2
+	;Graphics 400,300,0,2
 	SetBuffer BackBuffer()
-	image=LoadImage( fil$ )
+	Local image%=LoadImage( fil$ )
 	If image=0 RuntimeError "Unable to load image:"+fil$
 	MidHandle image
-	x=200:y=150:t=4
+	Local x%=200,y%=150,t%=4
 	Repeat
 		Cls
 		DrawImage image,x,y
 		Flip
-		key=False
+		Local key%=False
 		Repeat
 			If KeyHit(1) End
 			If KeyDown(200) y=y-t:key=True
@@ -475,7 +576,7 @@ Function ShowImage( fil$ )
 End Function
 
 Function ShowSound( fil$ )
-	sound=LoadSound( fil$ )
+	Local sound%=LoadSound( fil$ )
 	If sound=0 RuntimeError "Unable to load sound:"+fil$
 	Repeat
 		PlaySound sound
@@ -485,7 +586,9 @@ Function ShowSound( fil$ )
 End Function
 
 Function ShowMusic( fil$ )
-	music=PlayMusic( fil$ )
+	Local music%=PlayMusic( fil$ )
 	If music=0 RuntimeError "Unable to play music: "+fil$
 	WaitKey
 End Function
+;~IDEal Editor Parameters:
+;~C#Blitz3D

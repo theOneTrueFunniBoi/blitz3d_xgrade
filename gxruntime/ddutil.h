@@ -3,6 +3,7 @@
 #define DDUTIL_H
 
 #include <ddraw.h>
+#include <d3d11.h>
 
 class gxGraphics;
 typedef IDirectDrawSurface7 ddSurf;

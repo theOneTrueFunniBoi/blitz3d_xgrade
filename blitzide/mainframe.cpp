@@ -251,6 +251,7 @@ static char* bbFilter =
 "Images|*.bmp;*.iff;*.jpg;*.ogg;*.pcx;*.png;*.tga|"
 "Audio clips|*.it;*.mid;*.mod;*.mp3;*.rmi;*.s3m;*.sgt;*.wav;*.xm|"
 "3D Mesh data|*.3ds;*.b3d;*.fbx;*.md2;*.obj;*.x|"
+"SCP-CB v1.3.11 Room Mesh|*.rmesh|"
 "Decompiled 3D Map information|*.vmf|"
 "All files|*.*||";
 

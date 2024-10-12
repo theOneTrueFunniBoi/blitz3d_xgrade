@@ -45,6 +45,7 @@ static void makeKeywords() {
 	alphaTokes["Select"] = SELECT;
 	alphaTokes["Case"] = CASE;
 	alphaTokes["Default"] = DEFAULT;
+	alphaTokes["EndSelect"] = ENDSELECT;
 	alphaTokes["End Select"] = ENDSELECT;
 	alphaTokes["Repeat"] = REPEAT;
 	alphaTokes["Until"] = UNTIL;
