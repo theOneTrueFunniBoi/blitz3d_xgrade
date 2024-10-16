@@ -89,6 +89,7 @@ BEGIN
     POPUP "&Application"
     BEGIN
         MENUITEM "&Build and run Application\tF5", ID_EXECUTE
+        MENUITEM "Build and run Application (hooked)", ID_EXECUTELINKED
         MENUITEM "Build and run again\tF6",     ID_REEXECUTE
         MENUITEM "&Check for compilation errors\tF7", ID_COMPILE
         MENUITEM "Generate &Executable...",     ID_PUBLISH

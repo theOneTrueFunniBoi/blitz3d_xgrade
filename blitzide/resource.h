@@ -70,13 +70,15 @@
 #define ID_COMMANDLINE                  40129
 #define ID_REEXECUTE                    40130
 #define ID_SUPPORT                      40131
+#define ID_APPLICATION_BUILDANDRUNAPPLICATION 40133
+#define ID_EXECUTELINKED                40134
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         40133
+#define _APS_NEXT_COMMAND_VALUE         40135
 #define _APS_NEXT_CONTROL_VALUE         1025
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

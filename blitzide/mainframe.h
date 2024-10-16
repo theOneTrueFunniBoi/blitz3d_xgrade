@@ -44,6 +44,7 @@ public:
 	afx_msg void editReplace();
 
 	afx_msg void programExecute();
+	afx_msg void programExecuteLinked();
 	afx_msg void programReExecute();
 	afx_msg void programCompile();
 	afx_msg void programPublish();
@@ -95,7 +96,7 @@ private:
 	bool save( int n );
 
 	void compile( const string &cmd );
-	void build( bool exec,bool publish );
+	void build( bool exec,bool publish,bool isLinked=false );
 
 	//editorlistener
 	void cursorMoved( Editor *editor );

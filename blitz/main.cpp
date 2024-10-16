@@ -35,30 +35,27 @@ static void showInfo(){
 }
 
 static void showUsage(){
-	cout<<"Usage: blitzcc [-h|-q|+q|-c|-d|-k|+k|-v|-o exefile] [sourcefile.bb]"<<endl;
+	cout<<"Usage: blitzcc [-h|-q|+q|-c|-d|-k|+k|-v|-hook|-o exefile] [sourcefile.bb]"<<endl;
 }
 
 static void showHelp(){
 	showUsage();
 	cout<<"-h         : show this help"<<endl;
 	cout<<"-q         : quiet mode"<<endl;
-	cout<<"+q		  : very quiet mode"<<endl;
+	cout<<"+q         : very quiet mode"<<endl;
 	cout<<"-c         : compile only"<<endl;
 	cout<<"-d         : debug compile"<<endl;
 	cout<<"-k         : dump keywords"<<endl;
 	cout<<"+k         : dump keywords and syntax"<<endl;
-	cout<<"-v		  : version info"<<endl;
+	cout<<"-v         : version info"<<endl;
 	cout<<"-hook      : use runtime hook instead of generating temp executable" << endl;
 	cout<<"-o exefile : generate executable"<<endl;
+	exit(0);
 }
 
 static void err( const string &t ){
 	cout<<t<<endl;
 	exit(-1);
-}
-
-static void usageErr(){
-	err( "Usage error" );
 }
 
 static string quickHelp( const string &kw ){
@@ -138,6 +135,15 @@ static void versInfo(){
 	cout<<"Runtime version:"<<verstr(run_ver)<<endl;
 	cout<<"Debugger version:"<<verstr(dbg_ver)<<endl;
 	cout<<"Linker version:"<<verstr(lnk_ver)<<endl;
+	exit(0);
+}
+
+static void syntaxError(const char* err="")
+{
+	cout << "Invalid Syntax"; 
+	if (!!err) cout << ": " << err;
+	cout << endl << endl;
+	showHelp();
 }
 
 int _cdecl main( int argc,char *argv[] ){
@@ -151,6 +157,7 @@ int _cdecl main( int argc,char *argv[] ){
 	for( int k=1;k<argc;++k ){
 
 		string t=argv[k];
+		//string n=argv[k+1];
 
 		t=tolower(t);
 
@@ -175,10 +182,13 @@ int _cdecl main( int argc,char *argv[] ){
 		}else if (t=="-hook") {
 			hook = true;
 		}else if( t=="-o" ){
-			if( out_file.size() || k==argc-1 ) usageErr();
+			if( out_file.size() ) syntaxError("More than one output file is currently not supported.");
+			if ( k==argc-1 ) syntaxError("You must specify an output file to use the \"-o\" switch.");
+			//if ( n[0]=='-' ) syntaxError("You must specify an output file to use the \"-o\" switch.");
 			out_file=argv[++k];
 		}else{
-			if( in_file.size() || t[0]=='-' || t[0]=='+' ) usageErr();
+			if ( t[0]=='-' || t[0]=='+' ) syntaxError(("Undefined Blitzcc command line switch: \""+t+"\"!").c_str());
+			if ( in_file.size() ) syntaxError("More than one input file is currently not supported.");
 			in_file=argv[k];
 			for( ++k;k<argc;++k ){
 				string t=argv[k];
@@ -188,26 +198,39 @@ int _cdecl main( int argc,char *argv[] ){
 			}
 		}
 	}
+	
+	if (showhelp) showHelp();
+	if (versinfo) versInfo();
 
-	if( out_file.size() && !in_file.size() ) usageErr();
+	if (in_file == "")  syntaxError("An input file must be specified!");
+
+	if (!in_file.size()) syntaxError("Input file does not exist or contains no information!");
+
+	if( out_file.size() && !in_file.size() ) syntaxError();
 
 	if( const char *er=openLibs() ) err( er );
 
 	if( const char *er=linkLibs() ) err( er );
 
-	if( showhelp ) showHelp();
 	if( dumpkeys ) dumpKeys( true,true,dumphelp );
-	if( versinfo ) versInfo();
-
-	if( !in_file.size() ) return 0;
 
 	if( in_file[0]=='\"' ){
-		if( in_file.size()<3 || in_file[in_file.size()-1]!='\"' ) usageErr();
+		if( in_file.size()<3 || in_file[in_file.size()-1]!='\"' ) syntaxError();
 		in_file=in_file.substr( 1,in_file.size()-2 );
 	}
 
 	ifstream in( in_file.c_str() );
 	if( !in ) err( "Unable to open input file" );
+
+	if (!hook && debug)
+	{
+		cout << "WARNING: Debug compile with hook disabled is UNFINISHED FUNCTIONALITY! Continue anyways (y/n)?"<<endl;
+		if (!(getchar() == 'y')) {
+			cout << "Aborted!"<<endl;
+			exit(0);
+		}
+	}
+
 	if( !quiet ){
 		showInfo();
 		cout<<"Compiling \""<<in_file<<"\""<<endl;
@@ -269,7 +292,7 @@ int _cdecl main( int argc,char *argv[] ){
 			err( "Error creating executable: " + out_file);
 		}
 	}else if( !compileonly ){
-		if ( debug || hook )
+		if ( hook )
 		{
 			//old system
 			void *entry=module->link( runtimeModule );

@@ -47,6 +47,7 @@ BEGIN_MESSAGE_MAP( MainFrame,CFrameWnd )
 	ON_COMMAND( ID_QUICKHELP,quick_Help )
 
 	ON_COMMAND( ID_EXECUTE,programExecute )
+	ON_COMMAND( ID_EXECUTELINKED,programExecuteLinked )
 	ON_COMMAND( ID_REEXECUTE,programReExecute )
 	ON_COMMAND( ID_COMPILE,programCompile )
 	ON_COMMAND( ID_PUBLISH,programPublish )
@@ -74,6 +75,7 @@ BEGIN_MESSAGE_MAP( MainFrame,CFrameWnd )
 	ON_UPDATE_COMMAND_UI( ID_FINDNEXT,updateCmdUI )
 	ON_UPDATE_COMMAND_UI( ID_REPLACE,updateCmdUI )
 	ON_UPDATE_COMMAND_UI( ID_EXECUTE,updateCmdUI )
+	ON_UPDATE_COMMAND_UI( ID_EXECUTELINKED,updateCmdUI )
 	ON_UPDATE_COMMAND_UI( ID_REEXECUTE,updateCmdUI )
 	ON_UPDATE_COMMAND_UI( ID_COMPILE,updateCmdUI )
 	ON_UPDATE_COMMAND_UI( ID_PUBLISH,updateCmdUI )
@@ -673,7 +675,7 @@ void MainFrame::compile( const string &cmd ){
 	AfxMessageBox( err.c_str(),MB_ICONWARNING|MB_OK );
 }
 
-void MainFrame::build( bool exec,bool publish ){
+void MainFrame::build( bool exec,bool publish,bool isLinked ){
 	Editor *e=getEditor();
 	if( !e ) return;
 
@@ -690,6 +692,7 @@ void MainFrame::build( bool exec,bool publish ){
 	string opts=" ";
 
 	if( prefs.prg_debug ) opts+="-d ";
+	if( isLinked ) opts+="-hook ";
 
 	if( publish ){
 		string exe=src_file;
@@ -700,7 +703,7 @@ void MainFrame::build( bool exec,bool publish ){
 			exe="untitled";
 		}
 
-		static char *exeFilter="Windows Executable files (*.exe)|*.exe||";
+		static char *exeFilter="Windows Executable files|*.exe||";
 		int t=OFN_NOCHANGEDIR|OFN_PATHMUSTEXIST|OFN_OVERWRITEPROMPT;
 		CFileDialog fd( false,"exe",exe.c_str(),t,exeFilter );
 		fd.m_ofn.lpstrTitle="Select executable filename";
@@ -737,6 +740,10 @@ void MainFrame::build( bool exec,bool publish ){
 
 void MainFrame::programExecute(){
 	build( true,false );
+}
+
+void MainFrame::programExecuteLinked() {
+	build( true,false,true );
 }
 
 void MainFrame::programReExecute(){
@@ -853,6 +860,8 @@ void MainFrame::updateCmdUIRange( CCmdUI *ui ){
 void MainFrame::updateCmdUI( CCmdUI *ui ){
 	int k;
 
+	bool tmpBool = false;
+
 	Editor *e=getEditor();
 
 	switch( ui->m_nID ){
@@ -881,8 +890,12 @@ void MainFrame::updateCmdUI( CCmdUI *ui ){
 		break;
 	case ID_SELECTALL:case ID_QUICKHELP:
 	case ID_FIND:case ID_FINDNEXT:case ID_REPLACE:
-	case ID_EXECUTE:case ID_COMPILE:case ID_PUBLISH:
+	case ID_EXECUTELINKED:case ID_COMPILE:case ID_PUBLISH:
 		ui->Enable( !!e );
+		break;
+	case ID_EXECUTE:
+		if (!prefs.prg_debug && !!e) tmpBool = true;
+		ui->Enable(tmpBool);
 		break;
 	case ID_REEXECUTE:
 		ui->Enable( prefs.prg_lastbuild.size() );
