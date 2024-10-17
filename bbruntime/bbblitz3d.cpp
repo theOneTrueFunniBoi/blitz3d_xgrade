@@ -840,9 +840,11 @@ Entity *  bbLoadMesh( BBStr *f,Entity *p ){
 	//if (!debugEntity(e, "LoadMesh")) return 0;
 	MeshModel *m=d_new MeshModel();
 	collapseMesh( m,e );
-	Entity* i = insertEntity(m, p);
-	if (!debugMesh(m, "LoadMesh")) return 0;
-	return i;
+	//Entity* i = insertEntity(m, p);
+	//if (!debugMesh(m, "LoadMesh")) return 0;
+	//if (!debugEntity(i, "LoadMesh")) return 0;
+	//return i;
+	return insertEntity(m, p);
 }
 
 Entity *  bbLoadAnimMesh( BBStr *f,Entity *p ){
@@ -854,9 +856,11 @@ Entity *  bbLoadAnimMesh( BBStr *f,Entity *p ){
 	if( Animator *anim=e->getObject()->getAnimator() ){
 		anim->animate( 1,0,0,0 );
 	}
-	Entity* i = insertEntity(e, p);
-	if (!debugEntity(e, "LoadAnimMesh")) return 0;
-	return i;
+	//Entity* i = insertEntity(e, p);
+	//if (!debugEntity(e, "LoadAnimMesh")) return 0;
+	//if (!debugEntity(i, "LoadAnimMesh")) return 0;
+	//return i;
+	return insertEntity(e, p);
 }
 
 Entity *  bbCreateCube( Entity *p ){
