@@ -246,31 +246,42 @@ static const char *linkUserLibs(){
 	return err;
 }
 
-const char *openLibs(){
-	
-	char *p=getenv( "blitzpath" );
-	if( !p ) return "Can't find blitzpath environment variable";
-	home=string(p);
-
-	linkerHMOD=LoadLibrary( (home+"/bin/linker.dll").c_str() );
-	if( !linkerHMOD ) return "Unable to open linker.dll";
-
-	typedef Linker *(_cdecl*GetLinker)();
-	GetLinker gl=(GetLinker)GetProcAddress( linkerHMOD,"linkerGetLinker" );
-	if( !gl ) return "Error in linker.dll";
-	linkerLib=gl();
-
-	runtimeHMOD=LoadLibrary( (home+"/bin/runtime.dll").c_str() );
-	if( !runtimeHMOD ) return "Unable to open runtime.dll";
-
-	typedef Runtime *(_cdecl*GetRuntime)();
-	GetRuntime gr=(GetRuntime)GetProcAddress( runtimeHMOD,"runtimeGetRuntime" );
-	if( !gr ) return "Error in runtime.dll";
-	runtimeLib=gr();
-
+const char* openVersionLibs() {
 	bcc_ver=VERSION;
 	lnk_ver=linkerLib->version();
 	run_ver=runtimeLib->version();
+	return 0;
+}
+
+const char *openLibs(bool ovrr,string forcedBlitzpath) {
+	
+	const char* p;
+	if (!(forcedBlitzpath == "")) {
+		p = forcedBlitzpath.c_str();
+	}
+	else {
+		p = getenv("blitzpath");
+	}
+	if( !p && !ovrr ) return "Can't find blitzpath environment variable";
+	home=string(p);
+
+	linkerHMOD=LoadLibrary( (home+"/bin/linker.dll").c_str() );
+	if( !linkerHMOD && !ovrr ) return "Unable to open linker.dll";
+
+	typedef Linker *(_cdecl*GetLinker)();
+	GetLinker gl=(GetLinker)GetProcAddress( linkerHMOD,"linkerGetLinker" );
+	if( !gl && !ovrr ) return "Error in linker.dll";
+	linkerLib=gl();
+
+	runtimeHMOD=LoadLibrary( (home+"/bin/runtime.dll").c_str() );
+	if( !runtimeHMOD && !ovrr ) return "Unable to open runtime.dll";
+
+	typedef Runtime *(_cdecl*GetRuntime)();
+	GetRuntime gr=(GetRuntime)GetProcAddress( runtimeHMOD,"runtimeGetRuntime" );
+	if( !gr && !ovrr ) return "Error in runtime.dll";
+	runtimeLib=gr();
+
+	openVersionLibs();
 
 	runtimeLib->startup( GetModuleHandle(0) );
 

@@ -30,7 +30,9 @@ extern Environ *runtimeEnviron;
 extern vector<string> keyWords;
 extern vector<UserFunc> userFuncs;
 
-const char *openLibs();
+const char* openVersionLibs();
+
+const char *openLibs(bool ovrr,string forcedBlitzpath);
 
 const char *linkLibs();
 

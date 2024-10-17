@@ -35,21 +35,24 @@ static void showInfo(){
 }
 
 static void showUsage(){
-	cout<<"Usage: blitzcc [-h|-q|+q|-c|-d|-k|+k|-v|-hook|-o exefile] [sourcefile.bb]"<<endl;
+	cout<<"Usage: blitzcc [-h|-q|+q|-c|-d|-k|+k|-v|-hook|-blitzpath path|-noinputerr|-ide|-o exefile] [sourcefile.bb]"<<endl;
 }
 
 static void showHelp(){
 	showUsage();
-	cout<<"-h         : show this help"<<endl;
-	cout<<"-q         : quiet mode"<<endl;
-	cout<<"+q         : very quiet mode"<<endl;
-	cout<<"-c         : compile only"<<endl;
-	cout<<"-d         : debug compile"<<endl;
-	cout<<"-k         : dump keywords"<<endl;
-	cout<<"+k         : dump keywords and syntax"<<endl;
-	cout<<"-v         : version info"<<endl;
-	cout<<"-hook      : use runtime hook instead of generating temp executable" << endl;
-	cout<<"-o exefile : generate executable"<<endl;
+	cout<<"-h               : show this help"<<endl;
+	cout<<"-q               : quiet mode"<<endl;
+	cout<<"+q               : very quiet mode"<<endl;
+	cout<<"-c               : compile only"<<endl;
+	cout<<"-d               : debug compile"<<endl;
+	cout<<"-k               : dump keywords"<<endl;
+	cout<<"+k               : dump keywords and syntax"<<endl;
+	cout<<"-v               : version info"<<endl;
+	cout<<"-hook            : use runtime hook instead of generating temp executable"<<endl;
+	cout<<"-blitzpath path  : manually specify the path to your blitz3d install"<<endl;
+	cout<<"-noinputerr      : suppresses certain errors relating to the input file"<<endl;
+	cout<<"-ide             : treats all commands as though they are run by the ide"<<endl;
+	cout<<"-o exefile       : generate executable"<<endl;
 	exit(0);
 }
 
@@ -127,7 +130,9 @@ static string verstr( int ver ){
 	}else if(ver>>16==1){
 		b="FMOD";
 	}
-	return itoa((ver&0xffff)/100)+"."+itoa((ver&0xffff)%100)+":"+b;
+	//return itoa((ver & 0xffff) / 100)+"."+itoa((ver & 0xffff) % 100)+":"+b;
+	const int major = (ver & 0xffff) / 100, minor = (ver & 0xffff) % 100;
+	return to_string(major)+"."+to_string(minor)+":"+b;
 }
 
 static void versInfo(){
@@ -148,11 +153,11 @@ static void syntaxError(const char* err="")
 
 int _cdecl main( int argc,char *argv[] ){
 
-	string in_file,out_file,args;
+	string in_file,out_file,args,forcedBlitzpath;
 
 	bool debug=false,quiet=false,veryquiet=false,compileonly=false;
 	bool dumpkeys=false,dumphelp=false,showhelp=false,dumpasm=false;
-	bool versinfo=false,hook=false;
+	bool versinfo=false,hook=false,ovrr=false,ide=false;
 
 	for( int k=1;k<argc;++k ){
 
@@ -181,6 +186,12 @@ int _cdecl main( int argc,char *argv[] ){
 			versinfo=true;
 		}else if (t=="-hook") {
 			hook = true;
+		}else if (t=="-blitzpath") {
+			forcedBlitzpath = argv[++k];
+		}else if (t=="-noinputerr") {
+			ovrr = true;
+		}else if (t == "-ide") {
+			ide=ovrr=true;
 		}else if( t=="-o" ){
 			if( out_file.size() ) syntaxError("More than one output file is currently not supported.");
 			if ( k==argc-1 ) syntaxError("You must specify an output file to use the \"-o\" switch.");
@@ -198,17 +209,18 @@ int _cdecl main( int argc,char *argv[] ){
 			}
 		}
 	}
-	
+
 	if (showhelp) showHelp();
+
+	if (const char* er = openLibs(ovrr, forcedBlitzpath)) err(er);
+
 	if (versinfo) versInfo();
 
-	if (in_file == "")  syntaxError("An input file must be specified!");
+	if (in_file == "" && !ovrr)  syntaxError("An input file must be specified!");
 
-	if (!in_file.size()) syntaxError("Input file does not exist or contains no information!");
+	if (!in_file.size() && !ovrr) syntaxError("Input file does not exist or contains no information!");
 
 	if( out_file.size() && !in_file.size() ) syntaxError();
-
-	if( const char *er=openLibs() ) err( er );
 
 	if( const char *er=linkLibs() ) err( er );
 
@@ -220,7 +232,7 @@ int _cdecl main( int argc,char *argv[] ){
 	}
 
 	ifstream in( in_file.c_str() );
-	if( !in ) err( "Unable to open input file" );
+	if( !in && !ovrr ) err( "Unable to open input file" );
 
 	if (!hook && debug)
 	{
@@ -241,6 +253,12 @@ int _cdecl main( int argc,char *argv[] ){
 	if( n!=string::npos ){
 		if( !n || in_file[n-1]==':' ) ++n;
 		SetCurrentDirectory( in_file.substr(0,n).c_str() );
+	}
+
+	if (ide)
+	{
+		closeLibs();
+		return 0;
 	}
 
 	ProgNode *prog=0;
