@@ -51,35 +51,45 @@ static void _cdecl seTranslator( unsigned int u,EXCEPTION_POINTERS* pExp ){
 	string panicDesc = "This error has no provided description as of yet! If you have a description for this error, contact FUNNIMAN.";
 	bool clearDesc = false;
 	switch( u ){
-	case EXCEPTION_INT_DIVIDE_BY_ZERO:
-		panicStr = "Integer divide by zero!";
-		panicDesc = "Dividing integers by zero is an illegal operation.";
-	case EXCEPTION_FLT_DIVIDE_BY_ZERO:
-		panicStr = "Float divide by zero!";
-		panicDesc = "Dividing floats by zero is an illegal operation.";
-	case EXCEPTION_INT_OVERFLOW:
-		panicStr = "Integer overflow!";
-		panicDesc = "Integer exceeded it's absolute maximum value.";
-	case EXCEPTION_ACCESS_VIOLATION:
-		panicStr = "Unhandled Memory access violation!";
-		panicDesc = "The application attempted to read or write to an invalid or protected memory address.";
-	case EXCEPTION_ILLEGAL_INSTRUCTION:
-		panicStr = "Illegal instruction!";
-		panicDesc = "The application attempted to execute an undefined instruction.";
-	case EXCEPTION_STACK_OVERFLOW:
-		panicStr = "Stack overflow!";
-		panicDesc = "The application has exceeded it's stack memory limit.";
-	case EXCEPTION_INVALID_HANDLE:
-		panicStr = "Invalid handle!";
-		panicDesc = "Attempted to use invalid kernel object. Perhaps it was closed?";
-	case EXCEPTION_IN_PAGE_ERROR:
-		panicStr = "In page error!";
-		panicDesc = "Attempted to access invalid page, and the system failed to load the page.";
-	case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
-		panicStr = "Array bounds exceeded!";
-		panicDesc = "Attempted to access out of bounds array element.";
-	default:
-		clearDesc = true;
+		case EXCEPTION_INT_DIVIDE_BY_ZERO:
+			panicStr = "Integer divide by zero!";
+			panicDesc = "Dividing integers by zero is an illegal operation.";
+			break;
+		case EXCEPTION_FLT_DIVIDE_BY_ZERO:
+			panicStr = "Float divide by zero!";
+			panicDesc = "Dividing floats by zero is an illegal operation.";
+			break;
+		case EXCEPTION_INT_OVERFLOW:
+			panicStr = "Integer overflow!";
+			panicDesc = "Integer exceeded it's absolute maximum value.";
+			break;
+		case EXCEPTION_ACCESS_VIOLATION:
+			panicStr = "Unhandled Memory access violation!";
+			panicDesc = "The application attempted to read or write to an invalid or protected memory address.";
+			break;
+		case EXCEPTION_ILLEGAL_INSTRUCTION:
+			panicStr = "Illegal instruction!";
+			panicDesc = "The application attempted to execute an undefined instruction.";
+			break;
+		case EXCEPTION_STACK_OVERFLOW:
+			panicStr = "Stack overflow!";
+			panicDesc = "The application has exceeded it's stack memory limit.";
+			break;
+		case EXCEPTION_INVALID_HANDLE:
+			panicStr = "Invalid handle!";
+			panicDesc = "Attempted to use invalid kernel object. Perhaps it was closed?";
+			break;
+		case EXCEPTION_IN_PAGE_ERROR:
+			panicStr = "In page error!";
+			panicDesc = "Attempted to access invalid page, and the system failed to load the page.";
+			break;
+		case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+			panicStr = "Array bounds exceeded!";
+			panicDesc = "Attempted to access out of bounds array element.";
+			break;
+		default:
+			clearDesc = true;
+			break;
 	}
 
 	// stupid hack to only not display the desc on an undefined exception while also removing the newline
