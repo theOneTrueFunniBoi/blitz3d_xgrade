@@ -9,7 +9,7 @@
 <table>
 <tr>
 <td>
-fontname$ - name of font to be loaded, e.g. "arial"<br />
+fontname$ - name of font to be loaded, e.g. "arial.ttf"<br />
 height - height of font in points (default is 12)<br />
 bold - True to load bold version of font, False not to (default is False)<br />
 italic - True to load italic version of font, False not to (default is False)<br />
@@ -23,7 +23,13 @@ underlined - True to load underlined version of font, False not to (default is F
 <td>
 Loads a font and returns a font handle.<br />
 <br />
-You can then use the font handle  with commands such as SetFont and FreeFont. <br />
+You can then use the font handle  with commands such as SetFont and FreeFont. 
+
+<br />
+
+<br />
+Note: If pulling a font from a local file, non TrueType or OpenType fonts' filename must match the font's internal name.
+<br />
 <br />
 Note: Blitz doesn't work with SYMBOL fonts, like Webdings and WingDings.
 </td>

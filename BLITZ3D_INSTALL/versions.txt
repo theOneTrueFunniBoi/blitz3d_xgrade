@@ -2,19 +2,19 @@
 
 Added MAV-Less Error Checking & Stack Trace reporting.
 
-Added new BlitzVersion, BlitzIdent, BlitzShortIdent, BlitzShortestIdent, ErrorLog, GetLineTrace, and GetAddressTrace keywords/commands.
+Added new BlitzVersion, BlitzIdent, BlitzShortIdent, BlitzShortestIdent, ErrorLog, GetLineTrace, GetAddressTrace, and Kaboom keywords/commands.
+
+Updated RuntimeError command.
 
 Fixed the Enter key not creating new lines in the IDE.
 
-Implemented multiple line code comments (uses C++ format: /* and */).
-
-Code comments may now be made using the c++ standard ("//")
+Single line code comments may now also be made using "//" instead of just ';'.
 
 Added taskbar icon for IDE.
 
 Fixed '*' not showing up on the titles of modified documents.
 
-Fixed LoadFont() requiring the font's filename to match the font's internal name.
+Fixed LoadFont requiring the font's filename to match the font's internal name.
 
 
 ***** V1.119 *****

@@ -4,12 +4,14 @@
 <link rel=stylesheet href=../css/commands.css type=text/css>
 </head>
 <body>
-<h1>RuntimeError message$</h1>
+<h1>RuntimeError message$,[type]</h1>
 <h1>Parameters</h1>
 <table>
 <tr>
 <td>
-message$ = Any valid string
+message$ - any valid string
+<br />
+type - optional type of runtime error to generate (integer value)
 </td>
 </tr>
 </table>
@@ -18,6 +20,21 @@ message$ = Any valid string
 <tr>
 <td>
 When doing your own error trapping, use this command to pop up a fatal error  and close the program. You can specify the error message that is displayed.
+<br />
+<br />
+If specified, the following are the runtime error types controled by [type]:
+
+<p>&bull; Default
+
+<p>Generates a runtime error using the standard type. The message$ string is passed in, followed by the generated stack and memory trace.
+
+<p>&bull; '2'
+
+<p>Generates a runtime error using a non-standard type that does not contain a stack or memory trace.
+
+<p>&bull; '3'
+
+<p>Generates a runtime error using the old type, as seen in non-mavless Blitz3D SoLoud versions.
 </td>
 </tr>
 </table>
@@ -27,7 +44,9 @@ When doing your own error trapping, use this command to pop up a fatal error  an
 <td>
 ;There was a problem - raise an error and quit<br />
 <br />
-RuntimeError "Installation corrupted. Please reinstall."
+Local whatHappened$ = "Missing required items: frogs.mp3"
+<br />
+RuntimeError("Installation corrupted! Error - "+whatHappened+" Please reinstall.",1)
 </td>
 </tr>
 </table>
