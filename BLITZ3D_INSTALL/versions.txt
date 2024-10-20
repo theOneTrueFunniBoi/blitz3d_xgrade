@@ -2,7 +2,7 @@
 
 Added MAV-Less Error Checking & Stack Trace reporting.
 
-Added new BlitzVersion, BlitzIdent, BlitzShortIdent, BlitzShortestIdent, ErrorLog, GetLineTrace, GetAddressTrace, and Kaboom keywords/commands.
+Added new BlitzVersion, BlitzIdent, BlitzShortIdent, BlitzShortestIdent, ErrorLog, GetLineTrace, GetAddressTrace, and Kaboom commands.
 
 Updated RuntimeError command.
 

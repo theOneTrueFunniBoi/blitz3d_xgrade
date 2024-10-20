@@ -11,8 +11,8 @@ content="text/html; charset=iso-8859-1">
 <body><br>
 &nbsp;<span class="Command">&nbsp;Comments&nbsp;</span> 
 <blockquote> 
-  <p>You add comments to your programs using the ';' character. Everything following 
-    the ';' until the end of the line will be ignored, this is useful for commenting 
+  <p>You add comments to your programs using the ';' or "//" characters. Everything following 
+    the ';' or "//" until the end of the line will be ignored, this is useful for commenting 
     your code - so you can always look through and follow each line in a logical 
     manner. </p>
   <p>The following code shows comments in use;</p>
@@ -25,7 +25,12 @@ content="text/html; charset=iso-8859-1">
         ; Begin the Redraw Function<br>
         Function Redraw()<br>
         ...<br>
-        End Function</blockquote>
+        End Function<br>
+		<br>
+		// Begin the Clear Function<br>
+		Function Clear()<br>
+		...<br>
+		End Function</blockquote>
       </td>
     </tr>
   </table>
@@ -38,7 +43,36 @@ content="text/html; charset=iso-8859-1">
       <blockquote> <br>
         Function Redraw() ; Begin the Redraw Function<br>
         ...<br>
-        End Function</blockquote>
+        End Function<br>
+		<br>
+		Function Clear() // Begin the Clear Function<br>
+		...<br>
+		End Function</blockquote>
+    </td>
+  </tr>
+</table>
+<blockquote>
+  <p>You can also create comments that span multiple lines. The "/*" characters are used to signal the start of a comment,
+	and the "*/" characters the end. Each instance of "/*" or "*/" must appear at the beginning of a line.</p>
+  <p>The following code shows multi-line comments in use;</p>
+</blockquote>
+<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
+  <tr> 
+    <td> 
+      <blockquote> <br>
+		; This function is no longer necessary, but will be kept in the source code file just in case.<br>
+		/*<br>
+        Function Redraw()<br>
+        ...<br>
+        End Function<br>
+		*/<br>
+		<br>
+		// This function is also no longer necessary.<br>
+		/*<br>
+        Function Clear()<br>
+        ...<br>
+        End Function<br>
+		*/</blockquote>
     </td>
   </tr>
 </table>
