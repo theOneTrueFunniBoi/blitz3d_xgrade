@@ -4,18 +4,88 @@
 !define PRODUCT_NAME "Blitz3D: X-Grade Edition"
 !define PRODUCT_NAME_VALID "Blitz3D X-Grade Edition"
 !define PRODUCT_NAME_SHORT "Blitz3D X-Grade"
-!define PRODUCT_VERSION "1.000"
-!define PRODUCT_VERSION_VALID "1_000"
+!define PRODUCT_VERSION "1.0"
+!define PRODUCT_VERSION_FULL "1.000"
+!define PRODUCT_VERSION_VALID "1000"
 # These three must be integers
 !define VERSIONMAJOR 1
 !define VERSIONMINOR 0
 !define DESCRIPTION "A fork of Blitz3D: SoLoud Edition that aims to upgrade Blitz3D for the better via bug fixes, new commands, etc."
 !define PRODUCT_PUBLISHER "funniman.exe"
 !define PRODUCT_WEB_SITE "https://github.com/theOneTrueFunniBoi/blitz3d_xgrade"
-!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
+
+!define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
+!define REG_UNINSTALL "${PRODUCT_UNINST_KEY}"
+
+;--- Add/Remove system macros: ---
+; (You may place them to include file)
+Var AR_SecFlags
+Var AR_RegFlags
+
+!macro InitSection SecName
+  ;  This macro reads component installed flag from the registry and
+  ;changes checked state of the section on the components page.
+  ;Input: section index constant name specified in Section command.
+
+  ClearErrors
+  ;Reading component status from registry
+  ReadRegDWORD $AR_RegFlags HKLM \
+    "${REG_UNINSTALL}\Components\${SecName}" "Installed"
+  IfErrors "default_${SecName}"
+    ;Status will stay default if registry value not found
+    ;(component was never installed)
+  IntOp $AR_RegFlags $AR_RegFlags & 0x0001  ;Turn off all other bits
+  SectionGetFlags ${${SecName}} $AR_SecFlags  ;Reading default section flags
+  IntOp $AR_SecFlags $AR_SecFlags & 0xFFFE  ;Turn lowest (enabled) bit off
+  IntOp $AR_SecFlags $AR_RegFlags | $AR_SecFlags      ;Change lowest bit
+
+  ;Writing modified flags
+  SectionSetFlags ${${SecName}} $AR_SecFlags
+
+ "default_${SecName}:"
+!macroend
+
+!macro FinishSection SecName
+  ;  This macro reads section flag set by user and removes the section
+  ;if it is not selected.
+  ;Then it writes component installed flag to registry
+  ;Input: section index constant name specified in Section command.
+
+  SectionGetFlags ${${SecName}} $AR_SecFlags  ;Reading section flags
+  ;Checking lowest bit:
+  IntOp $AR_SecFlags $AR_SecFlags & 0x0001
+  IntCmp $AR_SecFlags 1 "leave_${SecName}"
+    ;Section is not selected:
+    ;Calling Section uninstall macro and writing zero installed flag
+    !insertmacro "Remove_${${SecName}}"
+    WriteRegDWORD HKLM "${REG_UNINSTALL}\Components\${SecName}" \
+  "Installed" 0
+    Goto "exit_${SecName}"
+
+ "leave_${SecName}:"
+    ;Section is selected:
+    WriteRegDWORD HKLM "${REG_UNINSTALL}\Components\${SecName}" \
+  "Installed" 1
+
+ "exit_${SecName}:"
+!macroend
+
+;!macro RemoveSection SecName
+;  ;  This macro is used to call section's Remove_... macro
+;  ;from the uninstaller.
+;  ;Input: section index constant name specified in Section command.
+;
+;  !insertmacro "Remove_${${SecName}}"
+;!macroend
+;--- End of Add/Remove macros ---
+
+!define INST_FILE "XGrade-Setup-v${PRODUCT_VERSION_VALID}.exe"
+!define UNINST_FILE "XGrade-Modify.exe"
 
 !define PRIMARY_APPLICATION "XGrade-Launcher.exe"
+
+Var SMDir
 
 # This is the size (in kB) of all the files copied into "Program Files"
 !define INSTALLSIZE 7233
@@ -25,17 +95,29 @@
 ;!define ZIPDLL
 
 ; MUI 1.67 compatible ------
-!include "MUI.nsh"
+;!include "MUI.nsh"
+
+!include MUI2.nsh
+
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER "${PRODUCT_NAME_VALID}"
+
+!define MUI_BGCOLOR "SYSCLR:Window"
+!define MUI_TEXTCOLOR "SYSCLR:WindowText"
+!define MUI_INSTFILESPAGE_COLORS "000000 FFFFFF"
 
 RequestExecutionLevel admin
 !ifdef ZIPDLL
 	!include "zipdll.nsh"
 !endif
 
+;FindWindow $0 "#32770" "" $HWNDPARENT
+;GetDlgItem $0 $0 1006
+;SetCtlColors $0 0xFF0000 0x00FF00
+
 ; MUI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\classic-install.ico"
-!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\classic-uninstall.ico"
+!define MUI_ICON "bbsetup.ico"
+!define MUI_UNICON "bbremove.ico"
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
@@ -45,13 +127,18 @@ RequestExecutionLevel admin
 !insertmacro MUI_PAGE_COMPONENTS
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_STARTMENU 0 $SMDir
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
+!insertmacro MUI_UNPAGE_WELCOME
+;!insertmacro MUI_UNPAGE_COMPONENTS
+;!insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
 
 ; Language files
 !insertmacro MUI_LANGUAGE "English"
@@ -59,8 +146,11 @@ RequestExecutionLevel admin
 ; MUI end ------
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "XGrade-Setup-v${PRODUCT_VERSION_VALID}.exe"
+OutFile "${INST_FILE}"
 InstallDir "$PROGRAMFILES\Blitz3D X-Grade"
+InstallDirRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "InstallLocation"
+ComponentText "Check the components you want to add and uncheck \
+the components you want to remove:"
 ShowInstDetails show
 ShowUnInstDetails show
 
@@ -83,41 +173,54 @@ Section "Primary Components" SEC01
   SetOutPath "$INSTDIR\cfg"
   File /a /r /x *.prefs cfg\*.*
   ;File /r /x cfg\blitzide.prefs
-  SetOutPath "$INSTDIR\Games"
-  File /a /r Games\*.*
+  ;SetOutPath "$INSTDIR\Games"
+  ;File /a /r Games\*.*
   SetOutPath "$INSTDIR\help"
   File /a /r help\*.*
-  SetOutPath "$INSTDIR\samples"
-  File /a /r samples\*.*
-  SetOutPath "$INSTDIR\tutorials"
-  File /a /r tutorials\*.*
+  ;SetOutPath "$INSTDIR\samples"
+  ;File /a /r samples\*.*
+  ;SetOutPath "$INSTDIR\tutorials"
+  ;File /a /r tutorials\*.*
   SetOutPath "$INSTDIR\userlibs"
   File /a userlibs\UserLibs.txt
   SetOutPath "$INSTDIR"
   File /a versions.txt
   File /a XGrade-Launcher.exe
+  File /a bblaunch.ico
 !endif
   WriteRegExpandStr ${env_hkcu} "blitzpath" "$INSTDIR"
   SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
-  
-  # Registry information for add/remove programs
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "DisplayName" "${PRODUCT_PUBLISHER} - ${PRODUCT_NAME} - ${DESCRIPTION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "UninstallString" "$\"$INSTDIR\uninst.exe$\""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "QuietUninstallString" "$\"$INSTDIR\uninst.exe$\" /S"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "InstallLocation" "$\"$INSTDIR$\""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "DisplayIcon" "$\"$INSTDIR\logo.ico$\""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "Publisher" "$\"${PRODUCT_PUBLISHER}$\""
-  #WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "HelpLink" "$\"${HELPURL}$\""
-  #WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "URLUpdateInfo" "$\"${UPDATEURL}$\""
-  #WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "URLInfoAbout" "$\"${ABOUTURL}$\""
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "DisplayVersion" "$\"${PRODUCT_VERSION}$\""
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "VersionMajor" ${VERSIONMAJOR}
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "VersionMinor" ${VERSIONMINOR}
-  # There is no option for modifying or repairing the install
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "NoRepair" 1
-  # Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "EstimatedSize" ${INSTALLSIZE}
+!macro Remove_${SEC01}
+  ;Removes component one
+  DetailPrint "*** Removing Base COmponent"
+  Delete "$INSTDIR\bin\*.dll"
+  Delete "$INSTDIR\bin\blitzcc.exe"
+  Delete "$INSTDIR\bin\ide.exe"
+  ;Delete "$INSTDIR\BlitzViewer\*.*"
+  Delete "$INSTDIR\cfg\*.*"
+  ;Delete "$INSTDIR\Games\*.*"
+  Delete "$INSTDIR\help\*.*"
+  ;Delete "$INSTDIR\Media\*.*"
+  ;Delete "$INSTDIR\samples\*.*"
+  ;Delete "$INSTDIR\tutorials\*.*"
+  Delete "$INSTDIR\userlibs\*.*"
+
+  Delete "$INSTDIR\${PRIMARY_APPLICATION}"
+  Delete "$INSTDIR\LICENSE.txt"
+  Delete "$INSTDIR\versions.txt"
+  Delete "$INSTDIR\bblaunch.ico"
+
+  ;RMDir /r "$INSTDIR\bin"
+  RMDir "$INSTDIR\bin"
+  ;RMDir /r "$INSTDIR\BlitzViewer"
+  RMDir /r "$INSTDIR\cfg"
+  ;RMDir /r "$INSTDIR\Games"
+  RMDir /r "$INSTDIR\help"
+  ;RMDir /r "$INSTDIR\Media"
+  ;RMDir /r "$INSTDIR\samples"
+  ;RMDir /r "$INSTDIR\tutorials"
+  RMDir /r "$INSTDIR\userlibs"
+!macroend
 SectionEnd
 
 Section /o "Blitz Media Viewer" SEC02
@@ -138,59 +241,212 @@ Section /o "Blitz Media Viewer" SEC02
   SetOutPath "$INSTDIR\Media"
   File /a /r Media\*.*
 !endif
-  WriteRegExpandStr ${env_hkcu} "blitzviewer" "installed"
-  SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+  ;WriteRegExpandStr ${env_hkcu} "blitzviewer" "installed"
+  ;SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+!macro Remove_${SEC02}
+  ;Removes component one
+  DetailPrint "*** Removing BlitzViewer"
+  Delete "$INSTDIR\bin\blitzviewer.exe"
+  Delete "$INSTDIR\BlitzViewer\*.*"
+  Delete "$INSTDIR\Media\*.*"
+
+  ;RMDir /r "$INSTDIR\bin"
+  RMDir "$INSTDIR\bin"
+  RMDir /r "$INSTDIR\BlitzViewer"
+  RMDir /r "$INSTDIR\Media"
+!macroend
+SectionEnd
+
+Section /o "Samples & Tutorials" SEC03
+  SectionInstType ${IT_FULL}
+  AddSize 51222
+  SetOutPath "$INSTDIR"
+!ifdef ZIPDLL
+  SetOutPath "$INSTDIR"
+  File "${LOCALDIR}\samples.zip"
+  StrCpy $R0 "$INSTDIR\samples.zip"
+  ZipDLL::extractall "$R0" "$INSTDIR"
+  Delete "$R0"
+!else
+  ;SetOutPath "$INSTDIR\bin"
+  ;File /a /r /x blitzviewer bin\*.*
+  ;File /r /x bin\blitzviewer.exe
+  ;SetOutPath "$INSTDIR\cfg"
+  ;File /a /r /x *.prefs cfg\*.*
+  ;File /r /x cfg\blitzide.prefs
+  SetOutPath "$INSTDIR\Games"
+  File /a /r Games\*.*
+  ;SetOutPath "$INSTDIR\help"
+  ;File /a /r help\*.*
+  SetOutPath "$INSTDIR\samples"
+  File /a /r samples\*.*
+  SetOutPath "$INSTDIR\tutorials"
+  File /a /r tutorials\*.*
+  ;SetOutPath "$INSTDIR\userlibs"
+  ;File /a userlibs\UserLibs.txt
+  ;SetOutPath "$INSTDIR"
+  ;File /a versions.txt
+  ;File /a XGrade-Launcher.exe
+!endif
+  ;WriteRegExpandStr ${env_hkcu} "blitzviewer" "installed"
+  ;SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+!macro Remove_${SEC03}
+  ;Removes component one
+  DetailPrint "*** Removing Samples"
+  Delete "$INSTDIR\Games\*.*"
+  Delete "$INSTDIR\samples\*.*"
+  Delete "$INSTDIR\tutorials\*.*"
+
+  RMDir /r "$INSTDIR\Games"
+  RMDir /r "$INSTDIR\samples"
+  RMDir /r "$INSTDIR\tutorials"
+!macroend
 SectionEnd
 
 Section -AdditionalIcons
   SetOutPath $INSTDIR
   ;WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-  CreateDirectory "$SMPROGRAMS\${PRODUCT_NAME_SHORT}"
+  ;CreateDirectory "$SMPROGRAMS\${STARTMENU_FOLDER}"
   ;CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
-  WriteIniStr "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\${PRODUCT_NAME_SHORT} Github.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\${PRODUCT_NAME_VALID}.lnk" "$INSTDIR\${PRIMARY_APPLICATION}"
-  CreateShortCut "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\Uninstall ${PRODUCT_NAME_SHORT}.lnk" "$INSTDIR\uninst.exe"
+  ;WriteIniStr "$SMPROGRAMS\${STARTMENU_FOLDER}\${PRODUCT_NAME_SHORT} Github.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
+  ;CreateShortCut "$SMPROGRAMS\${STARTMENU_FOLDER}\${PRODUCT_NAME_VALID}.lnk" "$INSTDIR\${PRIMARY_APPLICATION}"
+  ;CreateShortCut "$SMPROGRAMS\${STARTMENU_FOLDER}\Uninstall ${PRODUCT_NAME_SHORT}.lnk" "$INSTDIR\modify.exe"
+  ;CreateShortCut "$SMPROGRAMS\${STARTMENU_FOLDER}\Modify ${PRODUCT_NAME_SHORT} Installation.lnk" "$INSTDIR\modify.exe"
+SectionEnd
+
+Section -StartMenu
+  !insertmacro MUI_STARTMENU_WRITE_BEGIN 0
+  CreateDirectory "$SMPROGRAMS\$SMDir"
+  WriteIniStr "$SMPROGRAMS\$SMDir\${PRODUCT_NAME_SHORT} Github.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
+  CreateShortCut "$SMPROGRAMS\$SMDir\${PRODUCT_NAME_VALID}.lnk" "$INSTDIR\${PRIMARY_APPLICATION}"
+  CreateShortCut "$SMPROGRAMS\$SMDir\Uninstall ${PRODUCT_NAME_SHORT}.lnk" "$INSTDIR\${UNINST_FILE}"
+  CreateShortCut "$SMPROGRAMS\$SMDir\Modify ${PRODUCT_NAME_SHORT} Installation.lnk" "$\"$EXEDIR\${INST_FILE}$\""
+  !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
 Section -Post
-  WriteUninstaller "$INSTDIR\uninst.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
+  WriteUninstaller "$INSTDIR\${UNINST_FILE}"
+  ;WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
+  ;WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
+  ;WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
+  ;WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
+  ;WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
+  # Registry information for add/remove programs
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "DisplayName" "${PRODUCT_NAME}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "Comments" "${DESCRIPTION}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "UninstallString" "$\"$INSTDIR\${UNINST_FILE}$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "QuietUninstallString" "$\"$INSTDIR\${UNINST_FILE}$\" /S"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "InstallLocation" "$\"$INSTDIR$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "DisplayIcon" "$\"$INSTDIR\bblaunch.ico$\""
+  #WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "Publisher" "$\"${PRODUCT_PUBLISHER}$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "Publisher" "${PRODUCT_PUBLISHER}"
+  #WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "HelpLink" "$\"${HELPURL}$\""
+  #WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "URLUpdateInfo" "$\"${UPDATEURL}$\""
+  #WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "URLInfoAbout" "$\"${ABOUTURL}$\""
+  #WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "DisplayVersion" "$\"${PRODUCT_VERSION}$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "DisplayVersion" "${PRODUCT_VERSION_FULL}"
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "VersionMajor" ${VERSIONMAJOR}
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "VersionMinor" ${VERSIONMINOR}
+  # There is no option for modifying or repairing the install
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "NoModify" 0
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "NoRepair" 1
+  # Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "EstimatedSize" ${INSTALLSIZE}
+  
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "InstallSource" "$\"$EXEDIR\$\""
+  ;WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "ModifyPath" "$\"$EXEDIR\${INST_FILE}$\""
 SectionEnd
 
 ; Section descriptions
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "The primary application components."
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "A tool for viewing various types of Blitz3D's supported media."
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "Examples programs and tutorials."
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
-Function un.onUninstSuccess
-  HideWindow
-  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) has been successfully removed from your computer. Some registry or path values may not properly update until you restart your computer."
+;Function un.onUninstSuccess
+;  HideWindow
+;  MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) has been successfully removed from your computer. Some registry or path values may not properly update until you restart your computer."
+;FunctionEnd
+
+;Function un.onInit
+;  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you absolutely sure you would like to remove $(^Name) and all it's related componenets and features?" IDYES +2
+;  Abort
+;FunctionEnd
+
+;--- Add/Remove callback functions: ---
+!macro SectionList MacroName
+  ;This macro used to perform operation on multiple sections.
+  ;List all of your components in following manner here.
+
+  !insertmacro "${MacroName}" "SEC01"
+  !insertmacro "${MacroName}" "SEC02"
+  !insertmacro "${MacroName}" "SEC03"
+!macroend
+
+;Var appPath
+
+Function .onInit
+  ;Reads components status for registry
+  !insertmacro SectionList "InitSection"
+  ;ReadRegStr $appPath HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "InstallLocation"
+  ;${If} ${FileExists} "$appPath\${PRIMARY_APPLICATION}"
+  ;  ;InstallDir "$appPath"
+  ;  StrCpy $INSTDIR $appPath
+  ;${EndIf}
 FunctionEnd
 
-Function un.onInit
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Are you absolutely sure you would like to remove $(^Name) and all it's related componenets and features?" IDYES +2
-  Abort
-FunctionEnd
+Section -FinishComponents
+  ;Removes unselected components and writes component status to registry
+  !insertmacro SectionList "FinishSection"
+SectionEnd
+
+;Section -Post
+;  ;Showing the results
+;  ExecShell "open" "$INSTDIR"
+;SectionEnd
 
 Section Uninstall
-  DeleteRegValue ${env_hkcu} "blitzviewer"
+  ;DeleteRegValue ${env_hkcu} "blitzviewer"
+  ;SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
   ;Delete "$INSTDIR\${PRODUCT_NAME}.url"
-  Delete "$INSTDIR\uninst.exe"
+  ;Delete "$INSTDIR\${UNINST_FILE}"
 
-  Delete "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\Uninstall ${PRODUCT_NAME_SHORT}.lnk"
-  Delete "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\${PRODUCT_NAME_SHORT} Github.url"
-  Delete "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\${PRODUCT_NAME_VALID}.lnk"
+  ;Delete "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\Uninstall ${PRODUCT_NAME_SHORT}.lnk"
+  ;Delete "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\Modify ${PRODUCT_NAME_SHORT} Installation.lnk"
+  ;Delete "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\${PRODUCT_NAME_SHORT} Github.url"
+  ;Delete "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\${PRODUCT_NAME_VALID}.lnk"
 
-  Delete "$INSTDIR\*.*"
+  ;Delete "$INSTDIR\bin\*.*"
+  ;Delete "$INSTDIR\BlitzViewer\*.*"
+  ;Delete "$INSTDIR\cfg\*.*"
+  ;Delete "$INSTDIR\Games\*.*"
+  ;Delete "$INSTDIR\help\*.*"
+  ;Delete "$INSTDIR\Media\*.*"
+  ;Delete "$INSTDIR\samples\*.*"
+  ;Delete "$INSTDIR\tutorials\*.*"
+  ;Delete "$INSTDIR\userlibs\*.*"
+  
+  ;Delete "$INSTDIR\${PRIMARY_APPLICATION}"
+  ;Delete "$INSTDIR\LICENSE.txt"
+  ;Delete "$INSTDIR\versions.txt"
+  
+  ;RMDir /r "$INSTDIR\bin"
+  ;RMDir /r "$INSTDIR\BlitzViewer"
+  ;RMDir /r "$INSTDIR\cfg"
+  ;RMDir /r "$INSTDIR\Games"
+  ;RMDir /r "$INSTDIR\help"
+  ;RMDir /r "$INSTDIR\Media"
+  ;RMDir /r "$INSTDIR\samples"
+  ;RMDir /r "$INSTDIR\tutorials"
+  ;RMDir /r "$INSTDIR\userlibs"
+  
+  !insertmacro SectionList "RemoveSection"
 
-  RMDir /r "$INSTDIR\*"
+  RMDir /r "$INSTDIR"
   
   ;SetOutPath "$INSTDIR\.."
   

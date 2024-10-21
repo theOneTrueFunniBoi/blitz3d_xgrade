@@ -12,6 +12,8 @@
 #include <sstream>
 #include <filesystem> 
 
+#include <sys/stat.h>
+
 namespace fs = std::filesystem;
 
 IMPLEMENT_DYNAMIC( MainFrame,CFrameWnd )
@@ -398,8 +400,10 @@ bool MainFrame::open( const string &f ){
 		else file=f;
 	}
 
-	if( isMediaFile( tolower( file ) ) ){
-		if (!getenv("blitzviewer") == NULL) {
+	if (isMediaFile(tolower(file))) {
+		struct stat buffer;
+		//if (!getenv("blitzviewer") == NULL) {
+		if (stat((prefs.homeDir + "/bin/blitzviewer.exe").c_str(), &buffer) == 0) {
 			string t = prefs.homeDir + "/bin/blitzviewer.exe";
 			if ((int)ShellExecute(::GetDesktopWindow(), 0, t.c_str(), file.c_str(), 0, SW_SHOW) > 32) {
 			}
