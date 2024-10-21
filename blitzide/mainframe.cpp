@@ -399,8 +399,20 @@ bool MainFrame::open( const string &f ){
 	}
 
 	if( isMediaFile( tolower( file ) ) ){
-		string t=prefs.homeDir+"/bin/blitzviewer.exe";
-		if( (int)ShellExecute( ::GetDesktopWindow(),0,t.c_str(),file.c_str(),0,SW_SHOW )>32 ){
+		if (!getenv("blitzviewer") == NULL) {
+			string t = prefs.homeDir + "/bin/blitzviewer.exe";
+			if ((int)ShellExecute(::GetDesktopWindow(), 0, t.c_str(), file.c_str(), 0, SW_SHOW) > 32) {
+			}
+		}
+		else {
+			string a = "Your ";
+			a += VersionConfig::blitzIdentShort;
+			a += " installation does not include BlitzViewer. Please install BlitzViewer via the "; 
+			a += VersionConfig::blitzIdentShortest;
+			a += " installer!";
+			//a += " blitzviewer = ";
+			//a += getenv("blitzviewer");
+			AfxMessageBox(a.c_str(), MB_ICONWARNING);
 		}
 		return false;
 	}
