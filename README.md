@@ -1,8 +1,8 @@
-## Blitz3D SoLoud: MAV-Less Edition
+## Blitz3D: X-Grade Edition
 
-This is a fork of BlitzResearch' Blitz3D: SoLoud Edition which implements juanjp600's MAV-Less/Stacktrace/FastExt Killer/~~OpenAL~~ Patches
+Blitz3D: X-Grade Edition is a fork of BlitzResearch' Blitz3D: SoLoud Edition which implements juanjp600's MAV-Less/Stacktrace/FastExt Killer/~~OpenAL~~ patches among other additions and fixes.
 
-### Setting up SoLoud MAV-Less Project Files
+### Setting up Blitz3D: X-Grade Project Files
 
 You will need to install Microsoft Visual Studio, and the CMake and Git utilities. Any recent version of MSVC should work, although the latest version of Community Edition 2022 is reccomended.
 
@@ -41,7 +41,7 @@ Or you could run the following shell/DOS command:
 cmake --build cmake-build-release --config Release
 ```
 
-Assuming all went well, the "BLITZ3D_INSTALL" directory will contain the final binaries, simply run "Mavless-Launcher.exe" to get blitzing!
+Assuming all went well, the "BLITZ3D_INSTALL" directory will contain the final binaries, simply run "XGrade-Launcher.exe" to get blitzing!
 
 ### To disable FMod
 Open "CMakeLists.txt"

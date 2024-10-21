@@ -2293,6 +2293,17 @@ BBStr *bbBlitzVersion()
 
 BBStr* bbBlitzIdent()
 {
+	/*string runtimeType = " (Unknown Build)";
+	if (runtime_ver >> 16 == 3) {
+		runtimeType = " (LibSGD Build)";
+	}
+	else if (runtime_ver >> 16 == 2) {
+		runtimeType = " (SoLoud Build)";
+	}
+	else if (runtime_ver >> 16 == 1) {
+		runtimeType = " (FMOD Build)";
+	}*/
+	//return new BBStr(VersionConfig::blitzIdent+runtimeType);
 	return new BBStr(VersionConfig::blitzIdent);
 }
 

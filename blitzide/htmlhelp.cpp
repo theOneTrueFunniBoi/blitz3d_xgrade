@@ -29,6 +29,15 @@ void HtmlHelp::OnBeforeNavigate2( LPCTSTR url,DWORD flags,LPCTSTR target,CByteAr
 		return;
 
 	}
+	CString str = url;
+	int pos = str.Find(L'#');
+	if (pos >= 0)
+	{
+		str = str.Mid(pos + 1);
+		ShellExecuteA(NULL, "open", str, NULL, NULL, SW_SHOWNORMAL);
+		*cancel = true;
+		return;
+	}
 	*cancel=false;
 }
 

@@ -14,4 +14,4 @@ target_compile_options(bblaunch PRIVATE /Gz)
 
 target_link_libraries(bblaunch ${LIBS})
 
-copy_exe_to_install(bblaunch Mavless-Launcher)
+copy_exe_to_install(bblaunch XGrade-Launcher)
