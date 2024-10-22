@@ -409,7 +409,7 @@ static void graphics( int w,int h,int d,int flags ){
 	gx_graphics=gx_runtime->openGraphics( w,h,d,gx_driver,flags );
 	if( !gx_runtime->idle() ) RTEX( 0 );
 	if( !gx_graphics ){
-		RTEX( "Unable to set graphics mode" );
+		RTEX( "Unable to set graphics mode: UNKNOWN!" );
 	}
 	curr_clsColor=0;
 	curr_color=0xffffffff;

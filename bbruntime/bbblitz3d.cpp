@@ -2214,6 +2214,54 @@ void  bbScaleEntity( Entity *e,float x,float y,float z,int global ){
 	e->setLocalScale(Vector(x,y,z));
 }
 
+float bbEntityScaleX( Entity* e,int global )
+{
+	if (!debugEntity(e, "EntityScaleX")) return 0;
+	Entity* dest;
+	global?
+	dest = 0:
+	dest = e->getParent();
+
+	if ( global ) { if (!debugEntity(dest, "EntityScaleX (e->getParent)")) return 0; }
+	tformed = Vector( 1,0,0 );
+	if ( e ) tformed = e->getWorldTform().m * tformed;
+	if ( global ) tformed = -dest->getWorldTform().m * tformed;
+
+	return sqrtf( tformed.x * tformed.x + tformed.y * tformed.y + tformed.z * tformed.z );
+}
+
+float bbEntityScaleY( Entity* e,int global )
+{
+	if (!debugEntity(e, "EntityScaleY")) return 0;
+	Entity* dest;
+	global?
+	dest = 0:
+	dest = e->getParent();
+
+	if ( global ) { if (!debugEntity(dest, "EntityScaleY (e->getParent)")) return 0; }
+	tformed = Vector( 0,1,0 );
+	if ( e ) tformed = e->getWorldTform().m * tformed;
+	if ( global ) tformed = -dest->getWorldTform().m * tformed;
+
+	return sqrtf( tformed.x * tformed.x + tformed.y * tformed.y + tformed.z * tformed.z );
+}
+
+float bbEntityScaleZ( Entity* e,int global )
+{
+	if (!debugEntity(e, "EntityScaleZ")) return 0;
+	Entity* dest;
+	global?
+	dest = 0:
+	dest = e->getParent();
+
+	if ( global ) { if (!debugEntity(dest, "EntityScaleZ (e->getParent)")) return 0; }
+	tformed = Vector( 0,0,1 );
+	if ( e ) tformed = e->getWorldTform().m * tformed;
+	if ( global ) tformed = -dest->getWorldTform().m * tformed;
+
+	return sqrtf( tformed.x * tformed.x + tformed.y * tformed.y + tformed.z * tformed.z );
+}
+
 void  bbRotateEntity( Entity *e,float p,float y,float r,int global ){
 	if (!debugEntity(e,"RotateEntity")) return;
 	global?
@@ -2566,6 +2614,9 @@ void blitz3d_link( void (*rtSym)( const char *sym,void *pc ) ){
 	rtSym( "#EntityPitch%entity%global=0",bbEntityPitch );
 	rtSym( "#EntityYaw%entity%global=0",bbEntityYaw );
 	rtSym( "#EntityRoll%entity%global=0",bbEntityRoll );
+	rtSym( "#EntityScaleX%entity%global=0",bbEntityScaleX );
+	rtSym( "#EntityScaleY%entity%global=0",bbEntityScaleY );
+	rtSym( "#EntityScaleZ%entity%global=0",bbEntityScaleZ );
 	rtSym( "#GetMatElement%entity%row%column",bbGetMatElement );
 	rtSym( "TFormPoint#x#y#z%source_entity%dest_entity",bbTFormPoint );
 	rtSym( "TFormVector#x#y#z%source_entity%dest_entity",bbTFormVector );

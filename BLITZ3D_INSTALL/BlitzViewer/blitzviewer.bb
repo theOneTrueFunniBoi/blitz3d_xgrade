@@ -90,25 +90,31 @@ Function ShowModel( fil$,md2%,rmesh% )
 		If KeyDown(17) Then MoveEntity camera,0,0,((0.05)+(0.05*Faster))/(1+Slower)
 		If KeyDown(30) Then MoveEntity camera,(-0.05-(0.05*Faster))/(1+Slower),0,0
 		If KeyDown(31) Then MoveEntity camera,0,0,(-0.05-(0.05*Faster))/(1+Slower)
-		If KeyDown(32) Then MoveEntity camera,(0.05+(0.05*Faster))/(1+Slower),0,0
+		If KeyDown(32) Then MoveEntity camera,(0.05+(0.05*Faster))/(1+Slower),0,0		
+		
+		If KeyDown(19) Then MoveEntity camera,0,((0.05)+(0.05*Faster))/(1+Slower),0		
+		If KeyDown(33) Then MoveEntity camera,0,((-0.05)-(0.05*Faster))/(1+Slower),0
 		
 		If KeyDown(1) Then End
 		
 		UpdateWorld
 		RenderWorld
 		Text 0,0,"Triangles:"+tc+" Vertices:"+vc+" Surfaces:"+sc		
-		Text 0,15,"CameraRotX: "+MXS+" CameraRotY: "+(-MYS)
+		Text 0,15,"CameraRotX: "+MXS+" CameraRotY: "+(-MYS)		
+		Text 0,30,"Controls:"		
+		Text 0,45,"  W - foward, A - Left, S - backward, D - Right"		
+		Text 0,45,"  R - up, F - down, Mouse - look"
 		Flip
 	Forever
 End Function
 
-Function Min#(a#,b#)
-	If a < b Then Return a Else Return b
-End Function
+;Function Min#(a#,b#)
+;	If a < b Then Return a Else Return b
+;End Function
 
-Function Max#(a#,b#)
-	If a > b Then Return a Else Return b
-End Function
+;Function Max#(a#,b#)
+;	If a > b Then Return a Else Return b
+;End Function
 
 Function LoadRMesh(file$)
 	;generate a texture made of white
@@ -445,7 +451,7 @@ Function LoadRMesh(file$)
 					;Stop
 				EndIf				
 			Default			
-			RuntimeError("UNSUPPORTED RMesh ENTITY TYPE")
+			RuntimeError("UNSUPPORTED RMESH ENTITY TYPE: "+temp1s)
 		End Select
 	Next
 	
@@ -465,7 +471,7 @@ Function LoadRMesh(file$)
 	
 	EntityAlpha Opaque,1.0
 
-	FreeTexture blankTexture		
+	FreeTexture blankTexture
 	
 	ScaleEntity Opaque,EntityScaleX(Opaque)/100,EntityScaleY(Opaque)/100,EntityScaleZ(Opaque)/100
 	
@@ -474,20 +480,20 @@ Function LoadRMesh(file$)
 	Return Opaque
 End Function
 
-Function EntityScaleX#(entity%, globl% = False)
-	If globl Then TFormVector 1, 0, 0, entity, 0 Else TFormVector 1, 0, 0, entity, GetParent(entity)
-	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
-End Function 
+;Function EntityScaleX#(entity%, globl% = False)
+;	If globl Then TFormVector 1, 0, 0, entity, 0 Else TFormVector 1, 0, 0, entity, GetParent(entity)
+;	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
+;End Function 
 
-Function EntityScaleY#(entity%, globl% = False)
-	If globl Then TFormVector 0, 1, 0, entity, 0 Else TFormVector 0, 1, 0, entity, GetParent(entity)
-	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
-End Function 
+;Function EntityScaleY#(entity%, globl% = False)
+;	If globl Then TFormVector 0, 1, 0, entity, 0 Else TFormVector 0, 1, 0, entity, GetParent(entity)
+;	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
+;End Function 
 
-Function EntityScaleZ#(entity%, globl% = False)
-	If globl Then TFormVector 0, 0, 1, entity, 0 Else TFormVector 0, 0, 1, entity, GetParent(entity)
-	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
-End Function 
+;Function EntityScaleZ#(entity%, globl% = False)
+;	If globl Then TFormVector 0, 0, 1, entity, 0 Else TFormVector 0, 0, 1, entity, GetParent(entity)
+;	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
+;End Function 
 
 Function StripFilename$(file$)
 	Local mi$=""

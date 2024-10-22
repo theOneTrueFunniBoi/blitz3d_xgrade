@@ -915,6 +915,9 @@ gxGraphics *gxRuntime::openGraphics( int w,int h,int d,int driver,int flags ){
 			int wx=cx-bw,wy=cy-bh;if( wy<0 ) wy=0;		//not above top!
 			MoveWindow( hwnd,wx,wy,ww+tw,hh+th,true );
 		}
+		else {
+			throw("Unable to set graphics mode: openWindowedGraphics failed!");
+		}
 	}else{
 		backupWindowState();
 

@@ -24,6 +24,8 @@ float bbCeil( float n ){ return (float)ceil(n); }
 float bbExp( float n ){ return (float)exp(n); }
 float bbLog( float n ){ return (float)log(n); }
 float bbLog10( float n ){ return (float)log10(n); }
+float bbMin( float a,float b ) { return (float)min(a, b); }
+float bbMax(float a, float b) { return (float)max(a, b); }
 
 //return rand float from 0...1
 static inline float rnd(){
@@ -74,6 +76,8 @@ void math_link( void (*rtSym)( const char *sym,void *pc ) ){
 	rtSym( "#Exp#float",bbExp );
 	rtSym( "#Log#float",bbLog );
 	rtSym( "#Log10#float",bbLog10 );
+	rtSym( "#Min#a#b",bbMin );
+	rtSym( "#Max#a#b", bbMax );
 	rtSym( "#Rnd#from#to=0",bbRnd );
 	rtSym( "%Rand%from%to=1",bbRand );
 	rtSym( "SeedRnd%seed",bbSeedRnd );
