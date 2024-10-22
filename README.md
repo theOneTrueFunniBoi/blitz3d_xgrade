@@ -17,7 +17,7 @@ You will also need to install the following optional MSVC components:
 Then, from a shell/DOS prompt:
 
 ``` shell
-git clone https://github.com/theOneTrueFunniBoi/mavless_soloud.git
+git clone https://github.com/theOneTrueFunniBoi/blitz3d_xgrade.git
 cd mavless_soloud
 cmake -S . -B cmake-build-release -A Win32 -G "Visual Studio 17 2022"
 ```
