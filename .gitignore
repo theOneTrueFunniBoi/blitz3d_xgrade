@@ -12,6 +12,7 @@ fmod375/lib/fmod.dll
 
 BLITZ3D_INSTALL/XGrade-Launcher.exe
 BLITZ3D_INSTALL/XGrade-Setup*.exe
+BLITZ3D_INSTALL/XGrade-Static*.zip
 BLITZ3D_INSTALL/bin/*
 BLITZ3D_INSTALL/cfg/blitzide.prefs
 BLITZ3D_INSTALL/tmp/*.bb
