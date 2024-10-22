@@ -88,7 +88,7 @@ Var AR_RegFlags
 Var SMDir
 
 # This is the size (in kB) of all the files copied into "Program Files"
-!define INSTALLSIZE 7233
+!define INSTALLSIZE 71200
 
 !define env_hkcu 'HKCU "Environment"'
 
@@ -130,8 +130,16 @@ RequestExecutionLevel admin
 !insertmacro MUI_PAGE_STARTMENU 0 $SMDir
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
+; Changelog page
+!define MUI_LICENSEPAGE_TEXT_TOP "${PRODUCT_NAME} setup conclusion"
+;!define MUI_LICENSEPAGE_TEXT_BOTTOM "Current ${PRODUCT_NAME_SHORT} version is ${PRODUCT_VERSION_FULL}"
+!define MUI_LICENSEPAGE_TEXT_BOTTOM "PLEASE NOTE: You may have to tell your anti-virus to exclude detections from the ${PRODUCT_NAME_SHORT} installation path ($INSTDIR), and or any programs you make."
+!define MUI_LICENSEPAGE_BUTTON "Finish" # or "Next" if you have other pages between the changelog and the  InstFiles page
+!define MUI_PAGE_HEADER_TEXT  "${PRODUCT_NAME} setup complete"
+!define MUI_PAGE_HEADER_SUBTEXT "${PRODUCT_NAME} installation is complete. The following is the changelog for the current and all previous ${PRODUCT_NAME_SHORT} versions."
+!insertmacro MUI_PAGE_LICENSE "versions.txt"
 ; Finish page
-!insertmacro MUI_PAGE_FINISH
+;!insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
 !insertmacro MUI_UNPAGE_WELCOME
@@ -147,7 +155,8 @@ RequestExecutionLevel admin
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "${INST_FILE}"
-InstallDir "$PROGRAMFILES\Blitz3D X-Grade"
+;InstallDir "$PROGRAMFILES\Blitz3D X-Grade"
+InstallDir "$LOCALAPPDATA\${PRODUCT_NAME_SHORT}"
 InstallDirRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_PUBLISHER} ${PRODUCT_NAME}" "InstallLocation"
 ComponentText "Check the components you want to add and uncheck \
 the components you want to remove:"
@@ -168,7 +177,7 @@ Section "Primary Components" SEC01
   Delete "$R0"
 !else
   SetOutPath "$INSTDIR\bin"
-  File /a /r /x blitzviewer bin\*.*
+  File /a /r /x blitzviewer.exe bin\*.*
   ;File /r /x bin\blitzviewer.exe
   SetOutPath "$INSTDIR\cfg"
   File /a /r /x *.prefs cfg\*.*
@@ -318,8 +327,8 @@ Section -StartMenu
   !insertmacro MUI_STARTMENU_WRITE_BEGIN 0
   CreateDirectory "$SMPROGRAMS\$SMDir"
   WriteIniStr "$SMPROGRAMS\$SMDir\${PRODUCT_NAME_SHORT} Github.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-  CreateShortCut "$SMPROGRAMS\$SMDir\${PRODUCT_NAME_VALID}.lnk" "$INSTDIR\${PRIMARY_APPLICATION}"
-  CreateShortCut "$SMPROGRAMS\$SMDir\Uninstall ${PRODUCT_NAME_SHORT}.lnk" "$INSTDIR\${UNINST_FILE}"
+  CreateShortCut "$SMPROGRAMS\$SMDir\${PRODUCT_NAME_VALID}.lnk" "$\"$INSTDIR\${PRIMARY_APPLICATION}$\""
+  CreateShortCut "$SMPROGRAMS\$SMDir\Remove ${PRODUCT_NAME_SHORT}.lnk" "$\"$INSTDIR\${UNINST_FILE}$\""
   CreateShortCut "$SMPROGRAMS\$SMDir\Modify ${PRODUCT_NAME_SHORT} Installation.lnk" "$\"$EXEDIR\${INST_FILE}$\""
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
@@ -450,7 +459,7 @@ Section Uninstall
   
   ;SetOutPath "$INSTDIR\.."
   
-  RMDir /r "$SMPROGRAMS\${PRODUCT_NAME_SHORT}\"
+  RMDir /r "$SMPROGRAMS\$SMDir\"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   SetAutoClose true

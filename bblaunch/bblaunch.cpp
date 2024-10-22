@@ -17,6 +17,19 @@
     return "";
 }*/
 
+static int desktopDepth() {
+    HDC hdc = GetDC(GetDesktopWindow());
+    return GetDeviceCaps(hdc, BITSPIXEL);
+}
+
+static void fail(const char* p) {
+    char bb_ret[255];
+    strcpy(bb_ret, VersionConfig::blitzIdentShort);
+    strcat(bb_ret, " Error");
+    ::MessageBox(0, p, bb_ret, MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR);
+    ExitProcess(-1);
+}
+
 static void getAppDir(char* buff, int buffSize) {
     if (GetModuleFileName(0, buff, buffSize)) {
         char* p = strrchr(buff, '\\');
@@ -26,27 +39,9 @@ static void getAppDir(char* buff, int buffSize) {
     }
 }
 
-static void fail( const char *p ){
-    char bb_ret[255];
-    strcpy(bb_ret, VersionConfig::blitzIdentShort);
-    strcat(bb_ret, " Error");
-    ::MessageBox( 0,p, bb_ret, MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST | MB_ICONERROR);
-    ExitProcess(-1);
-}
-
-static int desktopDepth(){
-    HDC hdc=GetDC( GetDesktopWindow() );
-    return GetDeviceCaps( hdc,BITSPIXEL );
-}
-
 int _stdcall WinMain( HINSTANCE inst,HINSTANCE prev,char *cmd,int show ){
 
     //because we're not using string in the launcher to optimize, we gotta do this shit
-    char bb_err[255];
-    strcpy(bb_err, "Unable to run ");
-    strcat(bb_err, VersionConfig::blitzIdentShort);
-    strcat(bb_err, ".");
-
     char md_err[255];
     strcpy(md_err, "Your desktop must be in high-colour mode to use ");
     strcat(md_err, VersionConfig::blitzIdentShort);
@@ -60,11 +55,12 @@ int _stdcall WinMain( HINSTANCE inst,HINSTANCE prev,char *cmd,int show ){
     SetCurrentDirectory( t.c_str() );
     t=t+"\\bin\\ide.exe "+cmd;*/
 
+    char envVar[MAX_PATH];
+    strcpy(envVar, "blitzpath=");
+
     char t[MAX_PATH];
     getAppDir(t, MAX_PATH);
 
-    char envVar[MAX_PATH];
-    strcpy(envVar, "blitzpath=");
     strcat(envVar, t);
     putenv(envVar);
     SetCurrentDirectory(t);
@@ -79,6 +75,10 @@ int _stdcall WinMain( HINSTANCE inst,HINSTANCE prev,char *cmd,int show ){
         char bb_ret2[255];
         strcpy(bb_ret2, VersionConfig::blitzIdentShort);
         strcat(bb_ret2, " Error");
+        char bb_err[255];
+        strcpy(bb_err, "Unable to run ");
+        strcat(bb_err, VersionConfig::blitzIdentShort);
+        strcat(bb_err, ".");
 		::MessageBox( 0,bb_err,bb_ret2,MB_SYSTEMMODAL|MB_SETFOREGROUND|MB_TOPMOST|MB_ICONERROR );
 		ExitProcess(-1);
 	}

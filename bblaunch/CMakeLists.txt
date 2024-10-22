@@ -10,6 +10,9 @@ add_executable(bblaunch WIN32
 
 set(LIBS versionconfig)
 
+set_property(TARGET bblaunch PROPERTY CXX_STANDARD 17)
+# set_property(TARGET bblaunch PROPERTY C_STANDARD 17)
+
 target_compile_options(bblaunch PRIVATE /Gz)
 
 target_link_libraries(bblaunch ${LIBS})
