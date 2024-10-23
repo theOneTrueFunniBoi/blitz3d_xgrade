@@ -2340,9 +2340,8 @@ BBStr *bbBlitzVersion()
 	itoa((VERSION & 0xffff) % 1000, minor, 5);
 	char buf[5];
 	sprintf( buf,"%03s",minor );
-	string ret = buf;
-	delete buf;
-	return new BBStr(to_string(major)+"."+ret);
+	//may cause memory leaks, but delete buf segfaults and im too stupid to fix it
+	return new BBStr(to_string(major)+"."+buf);
 }
 
 BBStr* bbBlitzIdent()
