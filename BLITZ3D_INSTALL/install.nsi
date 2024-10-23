@@ -5,8 +5,8 @@
 !define PRODUCT_NAME_VALID "Blitz3D X-Grade Edition"
 !define PRODUCT_NAME_SHORT "Blitz3D X-Grade"
 !define PRODUCT_VERSION "1.0"
-!define PRODUCT_VERSION_FULL "1.000"
-!define PRODUCT_VERSION_VALID "1000"
+!define PRODUCT_VERSION_FULL "1.001"
+!define PRODUCT_VERSION_VALID "1001"
 # These three must be integers
 !define VERSIONMAJOR 1
 !define VERSIONMINOR 0
@@ -166,7 +166,7 @@ ShowUnInstDetails show
 InstType "Full" IT_FULL
 InstType "Minimal" IT_MIN
 
-Section "Primary Components" SEC01
+Section "Blitz3D X-Grade Edition" SEC01
   SectionInstType ${IT_FULL} ${IT_MIN}
   SetOverwrite ifdiff
 !ifdef ZIPDLL
@@ -328,6 +328,7 @@ Section -StartMenu
   CreateDirectory "$SMPROGRAMS\$SMDir"
   WriteIniStr "$SMPROGRAMS\$SMDir\${PRODUCT_NAME_SHORT} Github.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\$SMDir\${PRODUCT_NAME_VALID}.lnk" "$\"$INSTDIR\${PRIMARY_APPLICATION}$\""
+  CreateShortCut "$SMPROGRAMS\$SMDir\Blitz3D Media Viewer.lnk" "$\"$INSTDIR\${PRIMARY_APPLICATION} -mediaviewer$\""
   CreateShortCut "$SMPROGRAMS\$SMDir\Remove ${PRODUCT_NAME_SHORT}.lnk" "$\"$INSTDIR\${UNINST_FILE}$\""
   CreateShortCut "$SMPROGRAMS\$SMDir\Modify ${PRODUCT_NAME_SHORT} Installation.lnk" "$\"$EXEDIR\${INST_FILE}$\""
   !insertmacro MUI_STARTMENU_WRITE_END

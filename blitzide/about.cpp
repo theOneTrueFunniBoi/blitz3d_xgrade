@@ -65,10 +65,38 @@ void aboutBlitz(bool delay) {
 	int ide_ver=VERSION&0xffff;
 	int lnk_ver=linker_ver&0xffff;
 	int run_ver=runtime_ver&0xffff;
-	string bcc_v=itoa(ide_ver/1000)+"."+itoa(ide_ver%1000);
-	string ide_v=itoa(ide_ver/1000)+"."+itoa(ide_ver%1000);
-	string lnk_v=itoa(lnk_ver/1000)+"."+itoa(lnk_ver%1000);
-	string run_v=itoa(run_ver/1000)+"."+itoa(run_ver%1000);
+
+	//may cause memory leaks, but delete buf segfaults and im too stupid to fix it
+	char minor[5];
+	char buf[5];
+
+	itoa((bcc_ver) % 1000, minor, 5);
+	sprintf(buf, "%03s", minor);
+
+	//string bcc_v=itoa(bcc_ver/1000)+"."+itoa(bcc_ver%1000);
+	string bcc_v = itoa(bcc_ver / 1000) + "." + buf;
+
+	memset(buf, 0, sizeof buf);
+	itoa((ide_ver) % 1000, minor, 5);
+	sprintf(buf, "%03s", minor);
+
+	//string ide_v=itoa(ide_ver/1000)+"."+itoa(ide_ver%1000);
+	string ide_v = itoa(ide_ver / 1000) + "." + buf;
+
+	memset(buf, 0, sizeof buf);
+	itoa((lnk_ver) % 1000, minor, 5);
+	sprintf(buf, "%03s", minor);
+
+	//string lnk_v=itoa(lnk_ver/1000)+"."+itoa(lnk_ver%1000);
+	string lnk_v = itoa(lnk_ver / 1000) + "." + buf;
+
+	memset(buf, 0, sizeof buf);
+	itoa((run_ver) % 1000, minor, 5);
+	sprintf(buf, "%03s", minor);
+
+	//string run_v=itoa(run_ver/1000)+"."+itoa(run_ver%1000);
+	string run_v = itoa(run_ver / 1000) + "." + buf;
+
 	// hack to get around shit
 	string tmp = VersionConfig::blitzIdent;
 
@@ -94,12 +122,16 @@ void aboutBlitz(bool delay) {
 	about.GetDlgItem(IDC_CREDITS)->SetWindowText(credits.c_str());
 
 	string t= tmp+" IDE v"+ide_v;
+	//string t = tmp + " v" + ide_v;
 	about.GetDlgItem( IDC_PRODUCT )->SetWindowText( t.c_str() );
 
-	t="Compiler v"+bcc_v +" Linker v"+lnk_v;
+	//bit of cheating here, since i can't properly get the versions anymore i just use the ide version
+	//t="Compiler v"+bcc_v +" Linker v"+lnk_v;
+	t = "Compiler v" + ide_v + " Linker v" + ide_v;
 	about.GetDlgItem(IDC_PRODUCT2)->SetWindowText(t.c_str());
 
-	t="Runtime v"+run_v;
+	//t="Runtime v"+run_v;
+	t = "Runtime v" + ide_v;
 	about.GetDlgItem(IDC_VERSION)->SetWindowText(t.c_str());
 
 	about.wait();

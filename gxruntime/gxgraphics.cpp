@@ -20,7 +20,7 @@ runtime(rt),dirDraw(dd),dir3d(0),dir3dDev(0),def_font(0),gfx_lost(false),dummy_m
 	front_canvas->cls();
 	back_canvas->cls();
 
-	def_font=loadFont( "Courier New",12,0 );
+	def_font=loadFont( "Courier",12,0 );
 
 	front_canvas->setFont( def_font );
 	back_canvas->setFont( def_font );

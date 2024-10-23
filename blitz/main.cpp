@@ -29,9 +29,11 @@ using namespace std;
 #undef environ
 
 static void showInfo(){
-	const int major=(VERSION&0xffff)/1000,minor=(VERSION&0xffff)%1000;
-	cout<<"BlitzCC MAV-Less v"<<major<<"."<<minor<<endl;
-	cout<<"(C)opyright 2000-2003 Blitz Research Ltd"<<endl;
+	const int major = (VERSION & 0xffff) / 1000;
+	char minor[5];
+	itoa((VERSION & 0xffff) % 1000, minor, 5);
+	cout<<"Blitz Basic Closed Compiler (X-Grade Edition) v"<<major<<"."<<setw(3)<<setfill('0')<<minor<<endl;
+	cout<<"Copyright 2000-2003 Blitz Research Ltd | Copyright 2024 funniman.exe"<<endl;
 }
 
 static void showUsage(){
@@ -131,8 +133,13 @@ static string verstr( int ver ){
 		b="FMOD";
 	}
 	//return itoa((ver & 0xffff) / 100)+"."+itoa((ver & 0xffff) % 100)+":"+b;
-	const int major = (ver & 0xffff) / 100, minor = (ver & 0xffff) % 100;
-	return to_string(major)+"."+to_string(minor)+":"+b;
+	//const int major = (ver & 0xffff) / 100, minor = (ver & 0xffff) % 100;
+	const int major = (ver & 0xffff) / 1000;
+	string minor = itoa((ver & 0xffff) % 1000);
+	char buf[5];
+	sprintf(buf, "%03s", minor.c_str());
+	//may cause memory leaks, but delete buf segfaults and im too stupid to fix it
+	return to_string(major)+"."+buf+":"+b;
 }
 
 static void versInfo(){

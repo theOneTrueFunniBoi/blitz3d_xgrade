@@ -1,4 +1,4 @@
-***** X-Grade V1.000 *****
+***** X-Grade V1.001 *****
 
 Added new Min, Max, EntityScaleX, EntityScaleY, and EntityScaleZ commands.
 

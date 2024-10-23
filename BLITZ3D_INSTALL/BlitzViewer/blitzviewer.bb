@@ -9,9 +9,13 @@ Global MXS#=180.0,MYS#=0.0
 Global Faster% = False
 Global Slower% = False
 
+Global exts$ = "Images|*.bmp;*.iff;*.jpg;*.ogg;*.pcx;*.png;*.tga|"
+exts = exts + "Audio clips|*.it;*.mid;*.mod;*.mp3;*.rmi;*.s3m;*.sgt;*.wav;*.xm|"
+exts = exts + "3D Mesh data|*.3ds;*.b3d;*.md2;*.x|"
+exts = exts + "SCP-CB v1.3.11 Room Mesh|*.rmesh||"
+
 AppTitle "Blitz3D Media Viewer: Initializing"
 Global fil$=Lower$( CommandLine$() )
-
 Global texA%[255]
 
 Global index%=Instr( fil$,"." )
@@ -19,25 +23,24 @@ Global ext$
 
 Graphics3D 800,600,0,2
 
+If (fil="") Then fil=CreateFileDialog( 1,"","",exts,"Blitz3D Media Viewer - Open Supported files...",CurrentDir() )
+If (fil="") Then End
+If (Not ErrorLog()="") Then RuntimeError(ErrorLog())
+
 If (index>0) Then ext$=Mid$( fil$,index+1 )
+AppTitle "Blitz3D Media Viewer: "+fil
 Select ext$
 	Case "x","3ds","b3d"
-		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 		ShowModel( fil$,False,False )
 	Case "md2"
-		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 		ShowModel( fil$,True,False )	
 	Case "rmesh"
-		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 		ShowModel( fil$,False,True )
 	Case "bmp","jpg","png","pcx","tga","iff"
-		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 		ShowImage( fil$ )
 	Case "wav","ogg"
-		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 		ShowSound( fil$ )
 	Case "mp3","mid","mod","x3m","xm","it"
-		AppTitle "Blitz3D Media Viewer: "+CommandLine$()
 		ShowMusic( fil$ )
 	Default
 		RuntimeError ("Invalid File Extension: '"+ext+"'")
@@ -99,11 +102,11 @@ Function ShowModel( fil$,md2%,rmesh% )
 		
 		UpdateWorld
 		RenderWorld
-		Text 0,0,"Triangles:"+tc+" Vertices:"+vc+" Surfaces:"+sc		
-		Text 0,15,"CameraRotX: "+MXS+" CameraRotY: "+(-MYS)		
-		Text 0,30,"Controls:"		
-		Text 0,45,"  W - foward, A - Left, S - backward, D - Right"		
-		Text 0,45,"  R - up, F - down, Mouse - look"
+		Text 0,0,"Triangles:"+tc+" Vertices:"+vc+" Surfaces:"+sc
+		Text 0,15,"CameraRotX: "+MXS+" CameraRotY: "+(-MYS)
+		Text 0,30,"Controls:"
+		Text 0,45,"  W - Foward, A - Left, S - Backward, D - Right"	
+		Text 0,60,"  R - Up, F - Down, Mouse - Look"
 		Flip
 	Forever
 End Function

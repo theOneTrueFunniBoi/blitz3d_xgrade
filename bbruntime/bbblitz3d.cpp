@@ -2335,8 +2335,14 @@ BBStr *bbEntityClass( Entity *e ){
 
 BBStr *bbBlitzVersion()
 {
-	const int major = (VERSION & 0xffff) / 1000, minor = (VERSION & 0xffff) % 1000;
-	return new BBStr(to_string(major)+"."+to_string(minor));
+	const int major = (VERSION & 0xffff) / 1000;
+	char minor[5];
+	itoa((VERSION & 0xffff) % 1000, minor, 5);
+	char buf[5];
+	sprintf( buf,"%03s",minor );
+	string ret = buf;
+	delete buf;
+	return new BBStr(to_string(major)+"."+ret);
 }
 
 BBStr* bbBlitzIdent()

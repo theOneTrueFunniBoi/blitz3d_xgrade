@@ -3,6 +3,7 @@
 #include "bbfilesystem.h"
 #include "bbstream.h"
 #include <fstream>
+#include <afxdlgs.h>
 
 gxFileSystem *gx_filesys;
 
@@ -45,6 +46,16 @@ static inline bool debugDir( gxDir *d,const char* a ){
 		RTEX( "Directory does not exist" );
 	} else {
 		errorLog.push_back(std::string(a)+std::string(": Directory does not exist"));
+	}
+	return false;
+}
+
+static inline bool debugFileDialog( int type, const char* a) {
+	if (type < 2) return true;
+	if( debug ){
+		RTEX( (string("A type of ")+itoa(type)+string(" is not valid for CFileDialog!")).c_str() );
+	} else {
+		errorLog.push_back(string(a)+string(": A type of ")+itoa(type)+string(" is not valid for CFileDialog!"));
 	}
 	return false;
 }
@@ -145,6 +156,27 @@ void bbDeleteFile( BBStr *f ){
 	delete f;
 }
 
+BBStr* bbCreateFileDialog( int dialogType, BBStr *defName,BBStr *defExt,BBStr *extentions,BBStr *title,BBStr *initialDir )
+{
+	if (!debugFileDialog( dialogType,"CreateFileDialog" )) return d_new BBStr("");
+	string name=*defName,ext=*defExt,exts=*extentions,titl=*title,startDir=*initialDir;
+	delete defName;delete defExt;delete extentions;delete title; delete initialDir;
+	bool type=false;
+	if ( dialogType==1 ) { type=true; }
+
+	int args = OFN_FILEMUSTEXIST|OFN_NOCHANGEDIR;
+
+	if ( dialogType==0 ) { args=OFN_NOCHANGEDIR|OFN_PATHMUSTEXIST|OFN_HIDEREADONLY|OFN_EXPLORER|OFN_OVERWRITEPROMPT; }
+
+	CFileDialog dlg( type,ext.c_str(),name.c_str(),args,exts.c_str() );
+
+	dlg.m_ofn.lpstrTitle = LPSTR(titl.c_str());
+	dlg.m_ofn.lpstrInitialDir = startDir.c_str();
+	int result = dlg.DoModal();
+	if (result != IDOK) return d_new BBStr("");
+	return d_new BBStr(dlg.GetPathName());
+}
+
 bool filesystem_create(){
 	if( gx_filesys=gx_runtime->openFileSystem( 0 ) ){
 		return true;
@@ -178,4 +210,6 @@ void filesystem_link( void(*rtSym)(const char*,void*) ){
 	rtSym( "%FileType$file",bbFileType );
 	rtSym( "CopyFile$file$to",bbCopyFile );
 	rtSym( "DeleteFile$file",bbDeleteFile );
+
+	rtSym( "$CreateFileDialog%type$defaultName$defaultExt$exts$title$initialDir",bbCreateFileDialog );
 }

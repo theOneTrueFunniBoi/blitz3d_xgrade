@@ -400,12 +400,21 @@ bool MainFrame::open( const string &f ){
 		else file=f;
 	}
 
-	if (isMediaFile(tolower(file))) {
+	if (isMediaFile(tolower(file)) || (f.find("-mediaviewer") != string::npos)) {
 		struct stat buffer;
 		//if (!getenv("blitzviewer") == NULL) {
 		if (stat((prefs.homeDir + "/bin/blitzviewer.exe").c_str(), &buffer) == 0) {
 			string t = prefs.homeDir + "/bin/blitzviewer.exe";
-			if ((int)ShellExecute(::GetDesktopWindow(), 0, t.c_str(), file.c_str(), 0, SW_SHOW) > 32) {
+			if (f == "-mediaviewer")
+			{
+				if ((int)ShellExecute(::GetDesktopWindow(), 0, t.c_str(), file.c_str(), 0, SW_SHOW) > 32) {
+				}
+			}
+			else
+			{
+				if ((int)ShellExecute(::GetDesktopWindow(), 0, t.c_str(), "", 0, SW_SHOW) > 32) {
+				}
+				exit(0);
 			}
 		}
 		else {
