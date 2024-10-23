@@ -405,7 +405,7 @@ bool MainFrame::open( const string &f ){
 		//if (!getenv("blitzviewer") == NULL) {
 		if (stat((prefs.homeDir + "/bin/blitzviewer.exe").c_str(), &buffer) == 0) {
 			string t = prefs.homeDir + "/bin/blitzviewer.exe";
-			if (f == "-mediaviewer")
+			if (f.find("-mediaviewer") == string::npos)
 			{
 				if ((int)ShellExecute(::GetDesktopWindow(), 0, t.c_str(), file.c_str(), 0, SW_SHOW) > 32) {
 				}
@@ -425,7 +425,8 @@ bool MainFrame::open( const string &f ){
 			a += " installer!";
 			//a += " blitzviewer = ";
 			//a += getenv("blitzviewer");
-			AfxMessageBox(a.c_str(), MB_ICONWARNING);
+			AfxMessageBox(a.c_str(), MB_ICONWARNING|MB_SYSTEMMODAL|MB_SETFOREGROUND|MB_TOPMOST);
+			if (f.find("-mediaviewer") != string::npos) exit(-1);
 		}
 		return false;
 	}
