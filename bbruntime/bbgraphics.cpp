@@ -3,6 +3,8 @@
 #include "bbgraphics.h"
 #include "bbinput.h"
 
+#include <dwmapi.h>
+
 gxGraphics *gx_graphics;
 gxCanvas *gx_canvas;
 
@@ -1216,6 +1218,78 @@ void bbHidePointer(){
 	gx_runtime->setPointerVisible( false );
 }
 
+/*//stuff to determine whether dark mode is supported
+typedef LONG NTSTATUS, * PNTSTATUS;
+#define STATUS_SUCCESS (0x00000000)  
+
+typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+
+RTL_OSVERSIONINFOW GetRealOSVersion() {
+	HMODULE hMod = ::GetModuleHandleW(L"ntdll.dll");
+	if (hMod) {
+		RtlGetVersionPtr fxPtr = (RtlGetVersionPtr)::GetProcAddress(hMod, "RtlGetVersion");
+		if (fxPtr != nullptr) {
+			RTL_OSVERSIONINFOW rovi = { 0 };
+			rovi.dwOSVersionInfoSize = sizeof(rovi);
+			if (STATUS_SUCCESS == fxPtr(&rovi)) {
+				return rovi;
+			}
+		}
+	}
+	RTL_OSVERSIONINFOW rovi = { 0 };
+	return rovi;
+}
+
+int bbEnableDarkMode()
+{
+	RTL_OSVERSIONINFOW winNum = GetRealOSVersion();
+	if (winNum.dwMajorVersion > 6)
+	{
+		//winrt::Windows::UI::ViewManagement::UISettings settings;
+		//auto background = settings.GetColorValue(winrt::Windows::UI::ViewManagement::UIColorType::Background);
+		auto background = GetSysColor(COLOR_WINDOW);
+		//auto foreground = settings.GetColorValue(winrt::Windows::UI::ViewManagement::UIColorType::Foreground);
+		if (background == RGB(0x00, 0x00, 0x00))
+		{
+			BOOL useDark = true;
+			BOOL SET_IMMERSIVE_DARK_MODE_SUCCESS = gx_runtime->DWMWinAttrib(DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &useDark, sizeof(true));
+			BOOL OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS = gx_runtime->DWMWinAttrib(19, &useDark, sizeof(true));
+			if (!OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS && !SET_IMMERSIVE_DARK_MODE_SUCCESS)
+			{
+				return 0;
+			}
+			return 1;
+		}
+		return 0;
+	}
+	else { return -1; }
+}
+
+int bbDisableDarkMode()
+{
+	RTL_OSVERSIONINFOW winNum = GetRealOSVersion();
+	if (winNum.dwMajorVersion > 6)
+	{
+		//winrt::Windows::UI::ViewManagement::UISettings settings;
+		//auto background = settings.GetColorValue(winrt::Windows::UI::ViewManagement::UIColorType::Background);
+		auto background = GetSysColor(COLOR_WINDOW);
+		//auto foreground = settings.GetColorValue(winrt::Windows::UI::ViewManagement::UIColorType::Foreground);
+		if (background == RGB(0x00, 0x00, 0x00))
+		{
+			BOOL useDark = true;
+			BOOL SET_IMMERSIVE_DARK_MODE_SUCCESS = gx_runtime->DWMWinAttrib(DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &useDark, sizeof(true));
+			BOOL OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS = gx_runtime->DWMWinAttrib(19, &useDark, sizeof(true));
+			if (!OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS && !SET_IMMERSIVE_DARK_MODE_SUCCESS)
+			{
+				return 0;
+			}
+			return 1;
+		}
+		return 0;
+	}
+	else { return -1; }
+}*/
+
 bool graphics_create(){
 	p_canvas=0;
 	filter=true;
@@ -1382,4 +1456,7 @@ void graphics_link( void (*rtSym)( const char *sym,void *pc ) ){
 
 	rtSym( "ShowPointer",bbShowPointer );
 	rtSym( "HidePointer",bbHidePointer );
+
+	//rtSym("%EnableTitlebarImmersiveDarkmode", bbEnableDarkMode);
+	//rtSym("%DisableTitlebarImmersiveDarkmode", bbDisableDarkMode);
 }

@@ -4,6 +4,8 @@ Blitz3D: X-Grade Edition is a fork of BlitzResearch' Blitz3D: SoLoud Edition whi
 
 ### Setting up Blitz3D: X-Grade Project Files
 
+#### Microsoft Visual Studio
+
 You will need to install Microsoft Visual Studio, and the CMake and Git utilities. Any recent version of MSVC should work, although the latest version of Community Edition 2022 is reccomended.
 
 You will also need to install the following optional MSVC components:
@@ -14,13 +16,26 @@ You will also need to install the following optional MSVC components:
 "ASP.NET and web development prerequisites"
 ```
 
-Then, from a shell/DOS prompt:
+#### Cloning the repo
+
+From a shell/DOS prompt:
 
 ``` shell
 git clone https://github.com/theOneTrueFunniBoi/blitz3d_xgrade.git
-cd mavless_soloud
+cd blitz3d_xgrade
+```
+
+and you will have the X-Grade source code on your PC!
+
+#### Creating the project files
+
+To create the X-Grade project files, run the following shell/DOS command:
+
+``` shell
 cmake -S . -B cmake-build-release -A Win32 -G "Visual Studio 17 2022"
 ```
+
+or you can run the premade "InitProj.bat"
 
 Assuming all went well, the project files should be built, and can be found in the "cmake-build-release" folder.
 
@@ -40,6 +55,8 @@ Or you could run the following shell/DOS command:
 ``` shell
 cmake --build cmake-build-release --config Release
 ```
+
+or you can run the premade "XrBuild.bat"
 
 Assuming all went well, the "BLITZ3D_INSTALL" directory will contain the final binaries, simply run "XGrade-Launcher.exe" to get blitzing!
 

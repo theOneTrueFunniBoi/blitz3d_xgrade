@@ -25,7 +25,7 @@ add_executable(blitzide WIN32
 	stdafx.h
 	tabber.h
 )
-set(LIBS config)
+set(LIBS config dwmapi.lib)
 
 target_compile_options(blitzide PRIVATE /Gz)
 set_property(TARGET blitzide PROPERTY CXX_STANDARD 17)

@@ -130,6 +130,8 @@ public:
 
 	void windowedModeInfo( int *caps );
 
+	bool DWMWinAttrib(int attrib, void *paramA, DWORD paramB);
+
 #if BB_FMOD_ENABLED
 	gxAudio *openAudio( int flags );
 	void closeAudio( gxAudio *audio );

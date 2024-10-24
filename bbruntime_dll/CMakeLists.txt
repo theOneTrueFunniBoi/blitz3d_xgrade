@@ -21,7 +21,7 @@ endif()
 
 target_compile_options(bbruntime_dll PRIVATE /Gz)
 
-set(LIBS version.lib bbruntime dbghelp.lib config)
+set(LIBS version.lib bbruntime dbghelp.lib config dwmapi.lib)
 
 target_link_options(bbruntime_dll PRIVATE /SUBSYSTEM:WINDOWS)
 

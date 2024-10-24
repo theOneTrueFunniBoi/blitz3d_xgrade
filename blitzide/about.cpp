@@ -3,8 +3,11 @@
 #include "prefs.h"
 #include "libs.h"
 #include "resource.h"
+#include "blitzide.h"
 
 #include <mmsystem.h>
+
+//BlitzIDE blitzIDE;
 
 char _credits[] = "\r\n";
 char _credits2[] = ": Mark Sibly\r\n\r\n";
@@ -60,7 +63,6 @@ void aboutBlitz(bool delay) {
 	Dialog about;
 
 	about.Create(IDD_ABOUT);
-
 	int bcc_ver=compiler_ver&0xffff;
 	int ide_ver=VERSION&0xffff;
 	int lnk_ver=linker_ver&0xffff;
@@ -133,6 +135,15 @@ void aboutBlitz(bool delay) {
 	//t="Runtime v"+run_v;
 	t = "Runtime v" + ide_v;
 	about.GetDlgItem(IDC_VERSION)->SetWindowText(t.c_str());
+
+	if (blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS)
+	{
+		DwmSetWindowAttribute(about.GetSafeHwnd(), DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS, sizeof(blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS));
+	}
+	else if (blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS)
+	{
+		DwmSetWindowAttribute(about.GetSafeHwnd(), 19, &blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS, sizeof(blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS));
+	}
 
 	about.wait();
 	about.EndDialog(0);

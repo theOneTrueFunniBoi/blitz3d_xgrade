@@ -9,31 +9,33 @@ Global MXS#=180.0,MYS#=0.0
 Global Faster% = False
 Global Slower% = False
 
+Const ver# = 2.0
+
 Global exts$ = "Images|*.bmp;*.iff;*.jpg;*.ogg;*.pcx;*.png;*.tga|"
 exts = exts + "Audio clips|*.it;*.mid;*.mod;*.mp3;*.rmi;*.s3m;*.sgt;*.wav;*.xm|"
 exts = exts + "3D Mesh data|*.3ds;*.b3d;*.md2;*.x|"
-exts = exts + "SCP-CB v1.3.11 Room Mesh|*.rmesh||"
+exts = exts + "SCP-CB v1.3.11 Room Mesh|*.rmesh|All Files|*.*||"
 
-AppTitle "Blitz3D Media Viewer: Initializing"
+AppTitle "Blitz Media Viewer v"+ver+": Initializing"
 Global fil$=Lower$( CommandLine$() )
 Global texA%[255]
 
-Global index%=Instr( fil$,"." )
 Global ext$
 
 Graphics3D 800,600,0,2
 
-If (fil="") Then fil=CreateFileDialog( 1,"","",exts,"Blitz3D Media Viewer - Open Supported files...",CurrentDir() )
+If (fil="") Then fil=CreateFileDialog( 1,"","",exts,"Blitz Media Viewer v"+ver+" - Open Supported files...",CurrentDir() )
 If (fil="") Then End
 If (Not ErrorLog()="") Then RuntimeError(ErrorLog())
+Global index%=Instr( fil$,"." )
 
-If (index>0) Then ext$=Mid$( fil$,index+1 )
-AppTitle "Blitz3D Media Viewer: "+fil
+If (index>0) Then ext$=Mid$( fil$,index+1 ) Else RuntimeError ("Binary files are currently unsupported")
+AppTitle "Blitz Media Viewer v"+ver+": "+fil
 Select ext$
 	Case "x","3ds","b3d"
 		ShowModel( fil$,False,False )
 	Case "md2"
-		ShowModel( fil$,True,False )	
+		ShowModel( fil$,True,False )
 	Case "rmesh"
 		ShowModel( fil$,False,True )
 	Case "bmp","jpg","png","pcx","tga","iff"
@@ -42,8 +44,24 @@ Select ext$
 		ShowSound( fil$ )
 	Case "mp3","mid","mod","x3m","xm","it"
 		ShowMusic( fil$ )
+	Case "txt","ini","xml","cfg"	
+		RuntimeError ("Blitz Media Viewer does not support text/configuration documents. Please use the X-Grade IDE to view this files")
+	Case "c","cpp","h","hpp"
+		RuntimeError ("Blitz Media Viewer does not support C/C++ source code documents. Please use the X-Grade IDE to view this files")
+	Case "nsi"	
+		RuntimeError ("Blitz Media Viewer does not support NSIS installer source code documents. Please use the X-Grade IDE to view this files")
+	Case "psd"
+		RuntimeError ("Photoshop Document support is coming in a later Blitz Media Viewer version")
+	Case "exe"	
+		RuntimeError ("Blitz Media Viewer is not yet able to view Application Resources")
+	Case "dll"	
+		RuntimeError ("Blitz Media Viewer is not yet able to view Dynamic Link Library Resources")
+	Case "lib"	
+		RuntimeError ("Blitz Media Viewer is not yet able to view Static Link Library Resources")
+	Case "htm","html","css","php"	
+		RuntimeError ("Blitz Media Viewer does not support web development based documents. Please use the X-Grade IDE to view this files")
 	Default
-		RuntimeError ("Invalid File Extension: '"+ext+"'")
+		RuntimeError ("Unsupported File Extension: '"+ext+"'")
 End Select
 
 Function ShowModel( fil$,md2%,rmesh% )

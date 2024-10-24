@@ -64,7 +64,7 @@ static void _cdecl seTranslator( unsigned int u,EXCEPTION_POINTERS* pExp ){
 			panicDesc = "Integer exceeded it's absolute maximum value.";
 			break;
 		case EXCEPTION_ACCESS_VIOLATION:
-			panicStr = "Unhandled Memory access violation!";
+			panicStr = "Memory access violation!";
 			panicDesc = "The application attempted to read or write to an invalid or protected memory address.";
 			break;
 		case EXCEPTION_ILLEGAL_INSTRUCTION:
@@ -365,7 +365,7 @@ int __stdcall bbWinMain(){
 
 			environSave.seekg(0, ios::beg);
 			//this is probably a really bad idea, but fuck it
-			environSave.read((char*)environ, size);
+			environSave.read((char*)cEnviron, size);
 
 			environSave.close();
 			//typedef Debugger* (_cdecl* GetDebugger)(HMODULE,char*);

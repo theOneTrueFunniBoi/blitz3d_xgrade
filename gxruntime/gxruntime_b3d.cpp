@@ -4,6 +4,8 @@
 
 #include "intrin.h"
 
+#include <dwmapi.h>
+
 // wiinnt.h doesn't have definitions for these, so im just gonna put them here and hope they don't fuck anything up
 #define PROCESSOR_ARCHITECTURE_ARM64            12
 #define PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64   13
@@ -68,6 +70,28 @@ enum{
 	WM_STOP=WM_APP+1,WM_RUN,WM_END
 };
 
+//stuff to determine whether dark mode is supported
+typedef LONG NTSTATUS, * PNTSTATUS;
+#define STATUS_SUCCESS (0x00000000)  
+
+typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
+
+RTL_OSVERSIONINFOW GetRealOSVersion() {
+	HMODULE hMod = ::GetModuleHandleW(L"ntdll.dll");
+	if (hMod) {
+		RtlGetVersionPtr fxPtr = (RtlGetVersionPtr)::GetProcAddress(hMod, "RtlGetVersion");
+		if (fxPtr != nullptr) {
+			RTL_OSVERSIONINFOW rovi = { 0 };
+			rovi.dwOSVersionInfoSize = sizeof(rovi);
+			if (STATUS_SUCCESS == fxPtr(&rovi)) {
+				return rovi;
+			}
+		}
+	}
+	RTL_OSVERSIONINFOW rovi = { 0 };
+	return rovi;
+}
+
 ////////////////////
 // STATIC STARTUP //
 ////////////////////
@@ -97,6 +121,25 @@ gxRuntime *gxRuntime::openRuntime( HINSTANCE hinst,const string &cmd_line,Debugg
 	int ws=WS_CAPTION,ws_ex=0;
 
 	HWND hwnd=CreateWindowEx( ws_ex,"Blitz Runtime Class",app_t,ws,0,0,0,0,0,0,0,0 );
+
+	/*RTL_OSVERSIONINFOW winNum = GetRealOSVersion();
+	if (winNum.dwMajorVersion > 6)
+	{
+		//winrt::Windows::UI::ViewManagement::UISettings settings;
+		//auto background = settings.GetColorValue(winrt::Windows::UI::ViewManagement::UIColorType::Background);
+		//auto background = GetSysColor(COLOR_WINDOW);
+		//auto foreground = settings.GetColorValue(winrt::Windows::UI::ViewManagement::UIColorType::Foreground);
+		//if (background == RGB(0x00, 0x00, 0x00))
+		{
+			BOOL useDark = true;
+			BOOL SET_IMMERSIVE_DARK_MODE_SUCCESS = DwmSetWindowAttribute(hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &useDark, sizeof(true));
+			BOOL OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS = DwmSetWindowAttribute(hwnd, 19, &useDark, sizeof(true));
+			//if (!OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS && !SET_IMMERSIVE_DARK_MODE_SUCCESS)
+			//{
+			//	return 0;
+			//}
+		}
+	}*/
 
 	UpdateWindow( hwnd );
 
@@ -669,6 +712,19 @@ void gxRuntime::setPointerVisible( bool vis ){
 	POINT pt;
 	GetCursorPos( &pt );
 	SetCursorPos( pt.x,pt.y );
+}
+
+/////////////////
+//  DWMARRTIB  //
+/////////////////
+
+bool gxRuntime::DWMWinAttrib(int attrib, void *paramA, DWORD paramB)
+{
+	bool retValue = SUCCEEDED(DwmSetWindowAttribute(hwnd, attrib, &paramA, paramB));
+	//ShowWindow(hwnd, SW_MINIMIZE);
+	//ShowWindow(hwnd, SW_RESTORE);
+	UpdateWindow(hwnd);
+	return retValue;
 }
 
 /////////////////

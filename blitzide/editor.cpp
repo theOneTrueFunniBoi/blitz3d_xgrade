@@ -398,6 +398,14 @@ void Editor::find(){
 	finder->m_fr.lpstrReplaceWith=replaceBuff;
 	finder->m_fr.wReplaceWithLen=256;
 	finder->Create( findOnly=true,0,0,FR_HIDEUPDOWN,this );
+	if (blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS)
+	{
+		DwmSetWindowAttribute(finder->GetSafeHwnd(), DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS, sizeof(blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS));
+	}
+	else if (blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS)
+	{
+		DwmSetWindowAttribute(finder->GetSafeHwnd(), 19, &blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS, sizeof(blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS));
+	}
 	found=false;
 }
 
@@ -409,6 +417,14 @@ void Editor::replace(){
 	finder->m_fr.lpstrReplaceWith=replaceBuff;
 	finder->m_fr.wReplaceWithLen=256;
 	finder->Create( findOnly=false,0,0,FR_HIDEUPDOWN,this );
+	if (blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS)
+	{
+		DwmSetWindowAttribute(finder->GetSafeHwnd(), DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS, sizeof(blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS));
+	}
+	else if (blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS)
+	{
+		DwmSetWindowAttribute(finder->GetSafeHwnd(), 19, &blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS, sizeof(blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS));
+	}
 	found=false;
 }
 

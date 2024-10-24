@@ -25,6 +25,7 @@ BEGIN_MESSAGE_MAP( MainFrame,CFrameWnd )
 	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
 	ON_WM_ACTIVATE()
+	ON_WM_DRAWITEM()
 
 	ON_COMMAND( ID_NEW,fileNew )
 	ON_COMMAND( ID_OPEN,fileOpen )
@@ -117,6 +118,11 @@ MainFrame::MainFrame():exit_flag(false){
 int MainFrame::OnCreate( LPCREATESTRUCT lpCreateStruct ){
 	CFrameWnd::OnCreate( lpCreateStruct );
 	this->DragAcceptFiles();
+	blitzIDE.rgbBlack = 0x00000000;
+	blitzIDE.rgbDarkGrey = 0x00222222;
+	blitzIDE.blackScheme.clrBtnHighlight = blitzIDE.rgbDarkGrey;
+	blitzIDE.blackScheme.clrBtnShadow = blitzIDE.rgbBlack;
+	blitzIDE.blackScheme;
 
 	static HBITMAP toolbmp;
 	static SIZE imgsz,butsz;
@@ -149,6 +155,11 @@ int MainFrame::OnCreate( LPCREATESTRUCT lpCreateStruct ){
 	toolBar.SetSizes( butsz,imgsz );
 	toolBar.SetButtons( toolbuts,toolcnt );
 
+	if (blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS || blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS)
+	{
+		toolBar.PostMessageA(TB_SETCOLORSCHEME, 0, (LPARAM)&blitzIDE.blackScheme);
+	}
+
 	int style;
 	style=WS_CHILD|WS_VISIBLE|CBRS_ALIGN_BOTTOM;
 	statusBar.CreateEx( this,0,style );
@@ -157,6 +168,13 @@ int MainFrame::OnCreate( LPCREATESTRUCT lpCreateStruct ){
 	statusBar.SetPaneInfo( 0,ID_STATUSTEXT,SBPS_NOBORDERS|SBPS_STRETCH,0 );
 	statusBar.SetPaneInfo( 1,ID_COLROWTEXT,0,128 );
 	statusBar.SetPaneText( 0,"" );statusBar.SetPaneText( 1,"" );
+
+	if ((blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS) || (blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS))
+	{
+		//statusBar.PostMessageA(SB_SETBKCOLOR, 0, blitzIDE.rgbBlack);
+		statusBar.PostMessageA(SB_SETTEXT, 0|SBT_OWNERDRAW, 0);
+		statusBar.PostMessageA(SB_SETTEXT, 1|SBT_OWNERDRAW, 0);
+	}
 
 	tabber.Create( WS_VISIBLE|WS_CHILD|TCS_HOTTRACK,CRect( 0,0,0,0 ),this,1 );
 	tabber.SetFont( &prefs.tabsFont );
@@ -188,6 +206,17 @@ int MainFrame::OnCreate( LPCREATESTRUCT lpCreateStruct ){
 	}
 
 	return 0;
+}
+
+void MainFrame::OnDrawItem( int IDCtrl,LPDRAWITEMSTRUCT lpDrawItemStruct )
+{
+	CDC oDC;
+	oDC.Attach(lpDrawItemStruct->hDC);
+	oDC.SetTextColor(RGB(255, 255, 255));
+	oDC.SetBkColor(RGB(0, 0, 0));
+	lpDrawItemStruct->rcItem.left += 2;
+	oDC.DrawText(_T("Test"), &lpDrawItemStruct->rcItem, DT_LEFT);
+	oDC.Detach();
 }
 
 void MainFrame::OnDropFiles(HDROP hDropInfo) {
