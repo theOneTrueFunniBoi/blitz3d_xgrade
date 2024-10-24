@@ -34,7 +34,7 @@ For FMod licensing details, see [www.fmod.com/licensing](https://www.fmod.com/li
 
 ### Building SoLoud MAV-Less
 
-Simply open "Blitz3D.sln" and build the solution!
+Simply open "X-Grade.sln" and build the solution!
 
 Or you could run the following shell/DOS command:
 ``` shell

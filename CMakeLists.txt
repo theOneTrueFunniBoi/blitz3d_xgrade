@@ -3,21 +3,21 @@ cmake_minimum_required(VERSION 3.16)
 # Set ON for some debugging
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
-project("Blitz3D")
+project("X-Grade")
 
 option(BB_LIBSGD_ENABLED "Blitz3D LibSGD build enabled" OFF)
 option(BB_FMOD_ENABLED "Blitz3D FMOD build enabled" ON)
 
 if (NOT (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC"))
-	message(FATAL_ERROR "Blitz3D MUST be built using MSVC.")
+	message(FATAL_ERROR "X-Grade MUST be built using MSVC.")
 endif ()
 
 if (NOT (CMAKE_SIZEOF_VOID_P EQUAL 4))
-	message(FATAL_ERROR "Blitz3D MUST be built in 32-bit mode: Pass '-DCMAKE_GENERATOR_PLATFORM=Win32' to cmake when configuring.")
+	message(FATAL_ERROR "X-Grade MUST be built in 32-bit mode: Pass '-DCMAKE_GENERATOR_PLATFORM=Win32' to cmake when configuring.")
 endif ()
 
 if(BB_LIBSGD_ENABLED AND BB_FMOD_ENABLED)
-	message(FATAL_ERROR "Blitz3D FMOD and LibSGD builds are NOT compatible, please disable one or the other.")
+	message(FATAL_ERROR "X-Grade FMOD and LibSGD builds are NOT compatible, please disable one or the other.")
 endif()
 
 message(STATUS "### Configuring Blitz3D build for build type: ${CMAKE_BUILD_TYPE}")
