@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 # Set ON for some debugging
 set(CMAKE_VERBOSE_MAKEFILE OFF)
+set(CMAKE_BUILD_TYPE Release)
 
 project("X-Grade")
 
@@ -18,6 +19,14 @@ endif ()
 
 if(BB_LIBSGD_ENABLED AND BB_FMOD_ENABLED)
 	message(FATAL_ERROR "X-Grade FMOD and LibSGD builds are NOT compatible, please disable one or the other.")
+endif()
+
+if(BB_LIBSGD_ENABLED)
+	message(FATAL_ERROR "LibSGD builds are currently not supported.")
+endif()
+
+if(NOT (BB_FMOD_ENABLED))
+	message(FATAL_ERROR "FMod builds are currently the only supported build.")
 endif()
 
 message(STATUS "### Configuring Blitz3D build for build type: ${CMAKE_BUILD_TYPE}")

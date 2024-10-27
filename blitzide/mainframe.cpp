@@ -118,11 +118,6 @@ MainFrame::MainFrame():exit_flag(false){
 int MainFrame::OnCreate( LPCREATESTRUCT lpCreateStruct ){
 	CFrameWnd::OnCreate( lpCreateStruct );
 	this->DragAcceptFiles();
-	blitzIDE.rgbBlack = 0x00000000;
-	blitzIDE.rgbDarkGrey = 0x00222222;
-	blitzIDE.blackScheme.clrBtnHighlight = blitzIDE.rgbDarkGrey;
-	blitzIDE.blackScheme.clrBtnShadow = blitzIDE.rgbBlack;
-	blitzIDE.blackScheme;
 
 	static HBITMAP toolbmp;
 	static SIZE imgsz,butsz;
@@ -654,6 +649,15 @@ void MainFrame::compile( const string &cmd ){
 
 	CDialog compiling;
 	compiling.Create( IDD_COMPILING );
+
+	if (blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS)
+	{
+		DwmSetWindowAttribute(compiling.GetSafeHwnd(), DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS, sizeof(blitzIDE.SET_IMMERSIVE_DARK_MODE_SUCCESS));
+	}
+	else if (blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS)
+	{
+		DwmSetWindowAttribute(compiling.GetSafeHwnd(), 19, &blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS, sizeof(blitzIDE.OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS));
+	}
 
 	CProgressCtrl *cp=(CProgressCtrl*)compiling.GetDlgItem( IDC_COMPILEPROGRESS );
 	cp->SetStep(20);

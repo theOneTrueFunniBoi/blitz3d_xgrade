@@ -2217,48 +2217,54 @@ void  bbScaleEntity( Entity *e,float x,float y,float z,int global ){
 float bbEntityScaleX( Entity* e,int global )
 {
 	if (!debugEntity(e, "EntityScaleX")) return 0;
-	Entity* dest;
+	/*Entity* dest;
 	global?
 	dest = 0:
 	dest = e->getParent();
 
-	if ( global ) { if (!debugEntity(dest, "EntityScaleX (e->getParent)")) return 0; }
+	if ( !global ) { if (!debugEntity(dest, "EntityScaleX (e->getParent)")) return 0; }
 	tformed = Vector( 1,0,0 );
-	if ( e ) tformed = e->getWorldTform().m * tformed;
-	if ( global ) tformed = -dest->getWorldTform().m * tformed;
+	//if ( e ) tformed = e->getWorldTform().m * tformed;
+	if ( global ) tformed = e->getWorldTform().m * tformed; else tformed = -dest->getWorldTform().m * tformed;*/
 
+	//not the best way to do it, but who gives a fuck? i certainly don't
+	if ( global ) bbTFormVector( 1,0,0,e,0 ); else bbTFormVector( 1,0,0,e,e->getParent() );
 	return sqrtf( tformed.x * tformed.x + tformed.y * tformed.y + tformed.z * tformed.z );
 }
 
 float bbEntityScaleY( Entity* e,int global )
 {
 	if (!debugEntity(e, "EntityScaleY")) return 0;
-	Entity* dest;
+	/*Entity* dest;
 	global?
 	dest = 0:
 	dest = e->getParent();
 
-	if ( global ) { if (!debugEntity(dest, "EntityScaleY (e->getParent)")) return 0; }
+	if ( !global ) { if (!debugEntity(dest, "EntityScaleY (e->getParent)")) return 0; }
 	tformed = Vector( 0,1,0 );
-	if ( e ) tformed = e->getWorldTform().m * tformed;
-	if ( global ) tformed = -dest->getWorldTform().m * tformed;
+	//if ( e ) tformed = e->getWorldTform().m * tformed;
+	if ( global ) tformed = e->getWorldTform().m * tformed; else tformed = -dest->getWorldTform().m * tformed;*/
 
+	//not the best way to do it, but who gives a fuck? i certainly don't
+	if ( global ) bbTFormVector( 0,1,0,e,0 ); else bbTFormVector( 0,1,0,e,e->getParent() );
 	return sqrtf( tformed.x * tformed.x + tformed.y * tformed.y + tformed.z * tformed.z );
 }
 
 float bbEntityScaleZ( Entity* e,int global )
 {
 	if (!debugEntity(e, "EntityScaleZ")) return 0;
-	Entity* dest;
+	/*Entity* dest;
 	global?
 	dest = 0:
 	dest = e->getParent();
 
-	if ( global ) { if (!debugEntity(dest, "EntityScaleZ (e->getParent)")) return 0; }
+	if ( !global ) { if (!debugEntity(dest, "EntityScaleZ (e->getParent)")) return 0; }
 	tformed = Vector( 0,0,1 );
-	if ( e ) tformed = e->getWorldTform().m * tformed;
-	if ( global ) tformed = -dest->getWorldTform().m * tformed;
+	//if ( e ) tformed = e->getWorldTform().m * tformed;
+	if ( global ) tformed = e->getWorldTform().m * tformed; else tformed = -dest->getWorldTform().m * tformed;*/
 
+	//not the best way to do it, but who gives a fuck? i certainly don't
+	if ( global ) bbTFormVector( 0,0,1,e,0 ); else bbTFormVector( 0,0,1,e,e->getParent() );
 	return sqrtf( tformed.x * tformed.x + tformed.y * tformed.y + tformed.z * tformed.z );
 }
 

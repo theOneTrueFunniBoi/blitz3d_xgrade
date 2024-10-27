@@ -33,6 +33,11 @@ RTL_OSVERSIONINFOW GetRealOSVersion() {
 	return rovi;
 }
 
+inline bool IsDarkMode(winrt::Windows::UI::Color& clr)
+{
+    return (((5 * clr.G) + (2 * clr.R) + clr.B) > (8 * 128));
+}
+
 BOOL BlitzIDE::InitInstance(){
 
 #ifdef _DEBUG
@@ -47,6 +52,12 @@ BOOL BlitzIDE::InitInstance(){
 
 	mainFrame=new MainFrame();
 	m_pMainWnd = mainFrame;
+
+	blitzIDE.rgbBlack = 0x00000000;
+	blitzIDE.rgbDarkGrey = 0x00222222;
+	blitzIDE.blackScheme.clrBtnHighlight = blitzIDE.rgbDarkGrey;
+	blitzIDE.blackScheme.clrBtnShadow = blitzIDE.rgbBlack;
+	blitzIDE.blackScheme;
 
 	HICON icn = LoadIcon(MAKEINTRESOURCE(IDI_ICON1));
 
@@ -67,7 +78,8 @@ BOOL BlitzIDE::InitInstance(){
 		winrt::Windows::UI::ViewManagement::UISettings settings;
 		auto background = settings.GetColorValue(winrt::Windows::UI::ViewManagement::UIColorType::Background);
 		auto foreground = settings.GetColorValue(winrt::Windows::UI::ViewManagement::UIColorType::Foreground);
-		if (background.A == 255 && background.R == 0 && background.G == 0 && background.B == 0)
+		//if (background.A == 255 && background.R == 0 && background.G == 0 && background.B == 0)
+		if (IsDarkMode(foreground))
 		{
 			SET_IMMERSIVE_DARK_MODE_SUCCESS = SUCCEEDED(DwmSetWindowAttribute(mainFrame->GetSafeHwnd(), DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE, &USE_DARK_MODE, sizeof(USE_DARK_MODE)));
 			if (!SET_IMMERSIVE_DARK_MODE_SUCCESS) OLD_SET_IMMERSIVE_DARK_MODE_SUCCESS = SUCCEEDED(DwmSetWindowAttribute(mainFrame->GetSafeHwnd(), 19, &USE_DARK_MODE, sizeof(USE_DARK_MODE)));
@@ -77,8 +89,18 @@ BOOL BlitzIDE::InitInstance(){
 				exitMsg += " was unable to set the reactive window bar flag! The application will continue in light mode...";
 				AfxMessageBox(exitMsg.c_str(), MB_ICONWARNING | MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST);
 			}
+			//else
+			//{
+			//
+			//}
 		}
 	}
+	//HDC pDC;
+	//pDC = GetDC(mainFrame->GetSafeHwnd());
+	//HBRUSH hbr = CreateSolidBrush(blitzIDE.rgbDarkGrey);
+	//SetBkMode(pDC, OPAQUE);
+	//SetBkColor(pDC, blitzIDE.rgbDarkGrey);
+	//SendMessage(mainFrame->GetSafeHwnd(), WM_CTLCOLORDLG, (WPARAM)pDC, (LPARAM)mainFrame->GetSafeHwnd());
 	mainFrame->ShowWindow( m_nCmdShow );
 	mainFrame->UpdateWindow();
 	mainFrame->SetIcon(icn, true);
